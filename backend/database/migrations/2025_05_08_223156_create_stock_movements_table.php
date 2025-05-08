@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('regions', function (Blueprint $table) {
+        Schema::create('stock_movements', function (Blueprint $table) {
             $table->id();
-            $table->string('nom');
+            $table->foreignId('produit_id')->constrained()->onDelete('cascade');
+            $table->enum('type', ['entrée', 'sortie', 'ajustement']);
+            $table->integer('quantite');
+            $table->text('motif')->nullable();
             $table->timestamps();
         });
         
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('regions');
+        Schema::dropIfExists('stock_movements');
     }
 };

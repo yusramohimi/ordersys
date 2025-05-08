@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('regions', function (Blueprint $table) {
+        Schema::create('factures', function (Blueprint $table) {
             $table->id();
-            $table->string('nom');
+            $table->foreignId('commande_id')->constrained()->onDelete('cascade');
+            $table->string('pdf_path');
+            $table->dateTime('date_generation');
             $table->timestamps();
         });
         
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('regions');
+        Schema::dropIfExists('factures');
     }
 };

@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('regions', function (Blueprint $table) {
+        Schema::create('code_promos', function (Blueprint $table) {
             $table->id();
-            $table->string('nom');
+            $table->string('code')->unique();
+            $table->decimal('reduction', 8, 2);
+            $table->enum('type', ['montant', 'pourcentage']);
+            $table->dateTime('expire_le');
+            $table->integer('utilisations_max');
+            $table->integer('utilisations_actuelles')->default(0);
             $table->timestamps();
         });
         
@@ -24,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('regions');
+        Schema::dropIfExists('code_promos');
     }
 };

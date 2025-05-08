@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('regions', function (Blueprint $table) {
+        Schema::create('admin_logs', function (Blueprint $table) {
             $table->id();
-            $table->string('nom');
+            $table->foreignId('admin_id')->constrained()->onDelete('cascade');
+            $table->string('action');
+            $table->string('entity_type');
+            $table->unsignedBigInteger('entity_id');
+            $table->text('description')->nullable();
+            $table->ipAddress('ip_address')->nullable();
             $table->timestamps();
         });
         
@@ -24,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('regions');
+        Schema::dropIfExists('admin_logs');
     }
 };
