@@ -1,0 +1,28 @@
+# === Laravel Backend ===
+/backend/vendor/
+/backend/node_modules/
+/backend/storage/*.key
+/backend/.env
+/backend/.idea/
+/backend/.vscode/
+backend/public/storage
+backend/storage/*.log
+backend/storage/framework/cache
+backend/storage/framework/sessions
+backend/storage/framework/views
+backend/storage/logs/
+
+# === React Frontend ===
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.env.local
+/frontend/.env
+/frontend/.vscode/
+frontend/.DS_Store
+
+# === Global files ===
+*.log
+.env
+.env.*
+.DS_Store
+Thumbs.db
