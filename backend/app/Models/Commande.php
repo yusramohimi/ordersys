@@ -10,8 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Commande extends Model
 {
-    protected $fillable = ['client_id', 'livreur_id', 'code_promo_id', 'statut', 'heure_estimee_livraison'];
-
+protected $fillable = ['client_id', 'quantite', 'code_promo_id', 'prix_total', 'statut'];
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
@@ -27,10 +26,12 @@ class Commande extends Model
         return $this->belongsTo(CodePromo::class, 'code_promo_id');
     }
 
-    public function produits(): BelongsToMany
+   public function produits()
     {
-        return $this->belongsToMany(Produit::class, 'commande_produit')->withPivot('quantite', 'prix_unitaire');
+        return $this->belongsToMany(Produit::class, 'commande_produit') 
+        ->withPivot('quantite', 'prix_unitaire');    
     }
+
 
     public function facture(): HasOne
     {

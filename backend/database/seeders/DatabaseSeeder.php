@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RegionSeeder::class,
             CodePromoSeeder::class,
+            ProduitSeeder::class,
         ]);
 
 

@@ -1454,8 +1454,8 @@
                         <input type="email" class="form-control" id="email" name="email" required>
                       </div>
                       <div class="col-md-6">
-                        <label for="tel" class="form-label">Téléphone</label>
-                        <input type="tel" class="form-control" id="tel" name="tel" required>
+                        <label for="telephone" class="form-label">Téléphone</label>
+                        <input type="tel" class="form-control" id="telephone" name="telephone" required>
                       </div>
                     </div>
                     <div class="row mb-3">
@@ -1475,6 +1475,7 @@
                       <input type="text" class="form-control" id="adresse" name="adresse" required>
                     </div>
                     <button type="submit" class="btn btn-success w-100">Valider la commande</button>
+                    <p id="successMessage" class="text-success mt-3" style="display: none;"></p>
                   </form>
                 </div>
               </div>
@@ -1543,8 +1544,8 @@ $(document).ready(function () {
   const shippingFee = 0;
   let currentPromo = null;
   let promoDejaApplique = false;
-  
 
+  // Mise à jour des prix
   function updatePrices() {
     const subtotal = quantity * unitPrice;
     let reduction = 0;
@@ -1563,7 +1564,7 @@ $(document).ready(function () {
     $('#total').text(total.toFixed(2) + ' DH');
   }
 
-  // Incrément / décrément
+  // Incrémenter / décrémenter quantité
   $('#increment').on('click', function () {
     quantity++;
     updatePrices();
@@ -1576,7 +1577,7 @@ $(document).ready(function () {
     }
   });
 
-  // Toggle code promo
+  // Affichage champ promo
   $('#togglePromo').on('click', function () {
     $('#promoSection').slideToggle();
   });
@@ -1590,7 +1591,6 @@ $(document).ready(function () {
     }
 
     const code = $('#codePromoInput').val().trim();
-
     if (code === '') {
       $('#promoMessage').text('Veuillez entrer un code.')
                        .removeClass('text-success').addClass('text-danger');
@@ -1599,9 +1599,7 @@ $(document).ready(function () {
 
     fetch('http://127.0.0.1:8000/api/verifier-code', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code: code })
     })
     .then(res => res.json())
@@ -1609,7 +1607,7 @@ $(document).ready(function () {
       if (data.valide) {
         currentPromo = data;
         promoDejaApplique = true;
-        $('#promoMessage').text(` Code appliqué : -${data.reduction} ${data.type}`)
+        $('#promoMessage').text(`Code appliqué : -${data.reduction} ${data.type}`)
                          .removeClass('text-danger').addClass('text-success');
       } else {
         currentPromo = null;
@@ -1624,7 +1622,7 @@ $(document).ready(function () {
     });
   });
 
-  // Charger la liste des régions
+  // Charger les régions
   $.ajax({
     url: 'http://127.0.0.1:8000/api/regions',
     method: 'GET',
@@ -1638,17 +1636,64 @@ $(document).ready(function () {
     }
   });
 
-  // Vider le champ promo au chargement
-  $(window).on('load', function () {
-    $('#codePromoInput').val('');
-    $('#promoMessage').text('');
-    promoDejaApplique = false;
-    currentPromo = null;
-  });
+  // Réinitialiser champ promo au chargement
+  $('#codePromoInput').val('');
+  $('#promoMessage').text('');
+  promoDejaApplique = false;
+  currentPromo = null;
 
   updatePrices();
+
+  // Soumission du formulaire
+  $('form.popup-form').on('submit', function (e) {
+    e.preventDefault();
+
+    const data = {
+      nom: $('#nom').val(),
+      prenom: $('#prenom').val(),
+      telephone: $('#telephone').val(),
+      email: $('#email').val(),
+      ville: $('#ville').val(),
+      region: $('#region').val(),
+      adresse: $('#adresse').val(),
+      quantite: quantity,
+      prix_total: parseFloat($('#total').text().replace(' DH', '').replace(',', '.')),
+      promo_id: currentPromo?.id ?? null
+    };
+
+    fetch('http://127.0.0.1:8000/api/commander', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(response => {
+      if (response.success) {
+       $('#successMessage').text("Commande enregistrée avec succès !").show();
+
+       setTimeout(() => {
+        $('form.popup-form')[0].reset();
+        $('#promoMessage').text('');
+        $('#codePromoInput').val('');
+        $('#successMessage').fadeOut();
+        quantity = 1;
+        promoDejaApplique = false;
+        currentPromo = null;
+        updatePrices();
+      }, 5000);
+
+  } else {
+    $('#successMessage').hide();
+    alert("Erreur lors de l'enregistrement de la commande." + response.message);
+      }
+    })
+    .catch(() => {
+      alert("Erreur de communication avec le serveur.");
+    });
+  });
 });
 </script>
+
   
 </body>
 

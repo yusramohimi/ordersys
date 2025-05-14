@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Region;
 use App\Models\CodePromo;
+use App\Http\Controllers\API\CommandeController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -14,9 +15,7 @@ Route::get('/regions', function () {
 });
 
 Route::post('/verifier-code', function (Request $request) {
-    $code = $request->input('code');
-
-    $promo = CodePromo::where('code', $code)
+    $promo = CodePromo::where('code', $request->code)
         ->where('expire_le', '>=', now())
         ->whereColumn('utilisations_actuelles', '<', 'utilisations_max')
         ->first();
@@ -24,6 +23,7 @@ Route::post('/verifier-code', function (Request $request) {
     if ($promo) {
         return response()->json([
             'valide' => true,
+            'id' => $promo->id, 
             'reduction' => $promo->reduction,
             'type' => $promo->type
         ]);
@@ -31,3 +31,7 @@ Route::post('/verifier-code', function (Request $request) {
         return response()->json(['valide' => false]);
     }
 });
+
+
+
+Route::post('/commander', [CommandeController::class, 'commander']);
