@@ -1,0 +1,20 @@
+add_filter('woocommerce_add_to_cart_redirect', 'rediriger_vers_checkout_produit_specifique');
+function rediriger_vers_checkout_produit_specifique($url) {
+    // Vérifie si le produit ID 1588 est ajouté au panier
+    if ( isset($_REQUEST['add-to-cart']) && $_REQUEST['add-to-cart'] == 1588 ) {
+        // Redirige vers la page de checkout
+        return wc_get_checkout_url();
+    }
+    // Retourne l'URL par défaut (panier) pour les autres produits
+    return $url;
+}
+add_filter('wc_add_to_cart_message', 'supprimer_message_ajout_panier', 10, 2);
+function supprimer_message_ajout_panier($message, $product_id) {
+    // Vérifie si l'ID du produit ajouté au panier est 1588
+    if ($product_id == 1588) {
+        // Retourne un message vide pour ce produit
+        return '';
+    }
+    // Laisse le message par défaut pour les autres produits
+    return $message;
+}
