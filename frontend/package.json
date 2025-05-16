@@ -1,31 +1,42 @@
 {
-  "name": "front-end",
-  "private": true,
-  "version": "0.0.0",
+  "name": "gestion-achats",
+  "version": "1.0.0",
+  "description": "Application de gestion des achats avec React et Vite",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "serve": "vite preview"
   },
   "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@hookform/resolvers": "^5.0.1",
+    "@mui/material": "^7.1.0",
+    "@passageidentity/passage-elements": "^2.0.9",
+    "@react-oauth/google": "^0.12.2",
+    "@reduxjs/toolkit": "^2.8.1",
+    "@tailwindcss/postcss": "^4.0.7",
+    "@tailwindcss/vite": "^4.0.7",
+    "@tanstack/react-router": "^1.120.3",
+    "axios": "^1.7.9",
+    "framer-motion": "^12.11.1",
+    "lucide-react": "^0.510.0",
+    "postcss": "^8.5.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.56.3",
+    "react-icons": "^5.5.0",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.2.0",
+    "recharts": "^2.15.1",
+    "tailwindcss": "^4.0.7",
+    "zod": "^3.24.4"
   },
   "devDependencies": {
-    "@eslint/js": "^9.22.0",
-    "@tailwindcss/postcss": "^4.1.4",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "@vitejs/plugin-react": "^4.3.4",
-    "autoprefixer": "^10.4.21",
-    "eslint": "^9.22.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^16.0.0",
-    "postcss": "^8.5.3",
-    "tailwindcss": "^4.1.4",
-    "vite": "^6.3.1"
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.20",
+    "vite": "^5.2.9"
   }
 }
