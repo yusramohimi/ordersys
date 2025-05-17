@@ -1,15 +1,17 @@
 <?php
 
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 
-class Admin extends Model
+class Admin extends Authenticatable
 {
-    protected $fillable = ['nom', 'email', 'password'];
+    use HasApiTokens, Notifiable;
 
-    public function logs()
+    protected $fillable = ['nom', 'email', 'password'];
+     public function logs()
     {
         return $this->hasMany(AdminLog::class);
     }

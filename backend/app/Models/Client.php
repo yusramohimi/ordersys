@@ -1,18 +1,20 @@
 <?php
 
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Client extends Model
+class Client extends Authenticatable
 {
-protected $fillable = [
-    'nom', 'prenom', 'telephone', 'email', 'ville', 'region_id', 'adresse', 'password'
-];
+    use HasApiTokens, Notifiable;
 
+    protected $fillable = [
+        'nom', 'prenom', 'telephone', 'email', 'ville', 'region_id', 'adresse', 'password'
+    ];
 
     public function region(): BelongsTo
     {
@@ -24,5 +26,3 @@ protected $fillable = [
         return $this->hasMany(Commande::class);
     }
 }
-
-
