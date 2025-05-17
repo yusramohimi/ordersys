@@ -35,12 +35,6 @@ return [
     |
     */
 
-    'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
-    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -59,17 +53,50 @@ return [
     |
     */
 
+    'guards' => [
+
+    'web' => [
+        'driver' => 'session',
+        'provider' => 'users',
+    ],
+
+    // API Guards pour login via React
+    'client' => [
+        'driver' => 'sanctum',
+        'provider' => 'clients',
+    ],
+    'admin' => [
+        'driver' => 'sanctum',
+        'provider' => 'admins',
+    ],
+    'livreur' => [
+        'driver' => 'sanctum',
+        'provider' => 'livreurs',
+    ],
+],
+
     'providers' => [
+
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => App\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'clients' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Client::class,
+        ],
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
+        ],
+        'livreurs' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Livreur::class,
+        ],
     ],
+
+   
 
     /*
     |--------------------------------------------------------------------------

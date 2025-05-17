@@ -10,6 +10,8 @@ use App\Models\Produit;
 use App\Models\CodePromo;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ClientCredentialsMail;
 
 class CommandeController extends Controller
 {
@@ -28,7 +30,7 @@ public function commander(Request $request)
             'adresse' => $request->adresse,
             'password' => bcrypt($password)
         ]);
-
+        Mail::to($client->email)->send(new ClientCredentialsMail($client->email, $password));
         $produit = Produit::first();
         if (!$produit) {
             throw new \Exception('Produit introuvable');

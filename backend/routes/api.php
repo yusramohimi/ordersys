@@ -2,11 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Hash;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\API\AuthController;
 use App\Models\Region;
 use App\Models\CodePromo;
-use App\Models\User;
 use App\Http\Controllers\API\CommandeController;
 
 Route::get('/user', function (Request $request) {
@@ -40,8 +38,3 @@ Route::post('/verifier-code', function (Request $request) {
 Route::post('/commander', [CommandeController::class, 'commander']);
 
 Route::post('/login', [AuthController::class, 'login']);
-
-Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
