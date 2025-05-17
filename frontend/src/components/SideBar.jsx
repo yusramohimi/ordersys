@@ -1,7 +1,25 @@
-import { FaShoppingCart, FaPlusCircle, FaUsers, FaBoxOpen, FaWarehouse, FaTruck, FaHockeyPuck } from "react-icons/fa";
+import { FaShoppingCart, FaPlusCircle, FaUsers, FaBoxOpen, FaWarehouse, FaTruck, FaHockeyPuck, FaSignOutAlt } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
+import axios from "axios";
 
 function SideBar() {
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('token');
+
+      await axios.post('http://localhost:8000/api/logout', {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
+
+      localStorage.removeItem('token');
+      navigate('/login');
+    } catch (error) {
+      console.error("Erreur lors du logout", error);
+    }
+  };
   return (
     <div className="w-64 h-screen bg-gradient-to-b from-green-700 to-green-800 text-white p-4 flex flex-col fixed shadow-xl">
       {/* Logo/Site Name */}
@@ -23,14 +41,14 @@ function SideBar() {
         </NavLink>
 
         <NavLink 
-          to="/achat" 
+          to="/orders/admin" 
           className={({ isActive }) => 
             `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
             ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
           }
         >
           <FaShoppingCart className="text-lg" /> 
-          <span>Liste des Achats</span>
+          <span>Order List</span>
         </NavLink>
 
         <NavLink 
@@ -41,7 +59,7 @@ function SideBar() {
           }
         >
           <FaPlusCircle className="text-lg" /> 
-          <span>Ajouter un Achat</span>
+          <span>Add User</span>
         </NavLink>
 
         <NavLink 
@@ -63,7 +81,7 @@ function SideBar() {
           }
         >
           <FaBoxOpen className="text-lg" /> 
-          <span>Articles</span>
+          <span>Products</span>
         </NavLink>
 
         <NavLink 
@@ -85,8 +103,16 @@ function SideBar() {
           }
         >
           <FaTruck className="text-lg" /> 
-          <span>Fournisseurs</span>
+          <span>Delivery</span>
         </NavLink>
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200 hover:bg-red-600 mt-6 text-left w-full"
+        >
+          <FaSignOutAlt className="text-lg" />
+          <span>Logout</span>
+        </button>
       </nav>
 
       {/* Footer/User Info */}
