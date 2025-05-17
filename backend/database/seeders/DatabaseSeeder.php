@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             RegionSeeder::class,
             CodePromoSeeder::class,
             ProduitSeeder::class,
+            AdminSeeder::class,
         ]);
 
 
