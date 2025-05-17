@@ -27,6 +27,7 @@ class AuthController extends Controller
         if ($admin && Hash::check($password, $admin->password)) {
             $token = $admin->createToken('admin-token')->plainTextToken;
             return response()->json([
+                'success' => true,
                 'token' => $token,
                 'user_type' => 'admin',
                 'user' => $admin,

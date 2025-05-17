@@ -26,6 +26,8 @@ class DatabaseSeeder extends Seeder
             CodePromoSeeder::class,
             ProduitSeeder::class,
             AdminSeeder::class,
+            ClientSeeder::class,
+            LivreurSeeder::class,
         ]);
 
 
