@@ -63,7 +63,7 @@ function SideBar() {
         </NavLink>
 
         <NavLink 
-          to="/client" 
+          to="/clients-list" 
           className={({ isActive }) => 
             `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
             ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
