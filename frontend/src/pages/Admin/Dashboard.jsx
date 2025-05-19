@@ -1,53 +1,51 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Search, Globe, Bell, ChevronDown, Edit, Trash2 } from "lucide-react";
 import Apaexlinecolumn from "../../components/charts/Apexlinecolumn";
 import RadialChart from "../../components/charts/RadialChart";
-import SideBar from "../../components/SideBar";
+import SideBar from "./SideBar";
 const Dashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const usersData = [
-    {
-      id: 1,
-      name: "Jonny Stromberg",
-      idregion: "1",
-      region: "Front end Developer",
-    },
-    {
-      id: 2,
-      name: "Jonas Arnklint",
-      idregion: "2",
-      region: "Backend Developer",
-    },
-    { id: 3, name: "Martina Elm", idregion: "3", region: "UI/UX Designer" },
-    {
-      id: 4,
-      name: "Gustaf Lindqvist",
-      idregion: "4",
-      region: "Full Stack Developer",
-    },
-    { id: 5, name: "Alice Johnson", idregion: "5", region: "Project Manager" },
-    { id: 6, name: "Michael Brown", idregion: "6", region: "DevOps Engineer" },
-  ];
+  const [clients, setClients] = useState([]);
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [page, setPage] = useState(1);
-  const itemsPerPage = 4;
+  useEffect(() => {
+    fetch("http://localhost:8000/api/admin/clientslist/latest")
+      .then((res) => res.json())
+      .then((data) => setClients(data))
+      .catch((err) => console.error("Erreur fetch clients:", err));
+  }, []);
 
-  const filteredUsers = usersData.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.region.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [deliveryMen, setDeliveryMen] = useState([]);
+  const navigate = useNavigate();
 
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  const paginatedUsers = filteredUsers.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
+  useEffect(() => {
+    fetch("http://localhost:8000/api/admin/livreurlist/latest")
+      .then((res) => res.json())
+      .then((data) => setDeliveryMen(data))
+      .catch((err) => console.error(err));
+  }, []);
 
-  const handlePrev = () => setPage((prev) => Math.max(prev - 1, 1));
-  const handleNext = () => setPage((prev) => Math.min(prev + 1, totalPages));
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.post(
+        "http://localhost:8000/api/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+
+      localStorage.removeItem("token");
+      navigate("/login"); // redirection après logout
+    } catch (error) {
+      console.error("Erreur lors du logout", error);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -103,10 +101,7 @@ const Dashboard = () => {
                   </Link>
                   <div className="border-t border-gray-200 my-1"></div>
                   <button
-                    onClick={() => {
-                      // Add your logout logic here
-                      console.log("Logging out...");
-                    }}
+                    onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                   >
                     Logout
@@ -236,14 +231,14 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Transactions */}
+        {/* Orders */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="p-5 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-800">
               Recent Orders
             </h2>
             <Link
-              to="/orders/admin"
+              to="/admin/orders"
               className="text-sm text-green-600 hover:text-green-700 font-medium"
             >
               View All
@@ -344,13 +339,14 @@ const Dashboard = () => {
             </table>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6">
+        {/* Latest Clients */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 mt-6">
           <div className="p-5 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-800">
               Latest Clients
             </h2>
             <Link
-              to="/clients-list"
+              to="/admin/clientslist"
               className="text-sm text-green-600 hover:text-green-700 font-medium"
             >
               View All
@@ -360,97 +356,38 @@ const Dashboard = () => {
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  {[
-                    "ID",
-                    "Name",
-                    "Last Name",
-                    "Email",
-                    "City",
-                    "Region ID",
-                    "Adresse",
-                    "Joined",
-                    "Action",
-                  ].map((header, i) => (
-                    <th
-                      key={i}
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      {header}
-                    </th>
-                  ))}
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Last Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Phone
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Added on
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {[
-                  {
-                    id: 1,
-                    name: "Alex",
-                    lastName: "Johnson",
-                    email: "alex.johnson@example.com",
-                    city: "New York",
-                    regionId: "NY01",
-                    adresse: "123 Main St",
-                    joined: "2023-05-10",
-                  },
-                  {
-                    id: 2,
-                    name: "Maria",
-                    lastName: "Garcia",
-                    email: "maria.garcia@example.com",
-                    city: "Los Angeles",
-                    regionId: "CA07",
-                    adresse: "456 Elm St",
-                    joined: "2023-05-08",
-                  },
-                  {
-                    id: 3,
-                    name: "David",
-                    lastName: "Wilson",
-                    email: "david.wilson@example.com",
-                    city: "Chicago",
-                    regionId: "IL03",
-                    adresse: "789 Oak St",
-                    joined: "2023-05-06",
-                  },
-                  {
-                    id: 4,
-                    name: "Sarah",
-                    lastName: "Miller",
-                    email: "sarah.miller@example.com",
-                    city: "Houston",
-                    regionId: "TX02",
-                    adresse: "321 Pine St",
-                    joined: "2023-05-05",
-                  },
-                ].map((client, i) => (
+                {clients.map((client, i) => (
                   <tr key={i} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-900">
-                      {client.id}
+                    <td className="px-6 py-4 text-gray-900 font-medium">
+                      {client.nom}
                     </td>
-                    <td className="px-6 py-4 text-gray-500">{client.name}</td>
-                    <td className="px-6 py-4 text-gray-500">
-                      {client.lastName}
+                    <td className="px-6 py-4 text-gray-900 font-medium">
+                      {client.prenom}
                     </td>
-                    <td className="px-6 py-4 text-gray-500">{client.email}</td>
-                    <td className="px-6 py-4 text-gray-500">{client.city}</td>
-                    <td className="px-6 py-4 text-gray-500">
-                      {client.regionId}
+                    <td className="px-6 py-4 text-gray-700">{client.email}</td>
+                    <td className="px-6 py-4 text-gray-700">
+                      {client.telephone}
                     </td>
                     <td className="px-6 py-4 text-gray-500">
-                      {client.adresse}
-                    </td>
-                    <td className="px-6 py-4 text-gray-500">{client.joined}</td>
-                    <td className="px-6 py-4">
-                      <button
-                        className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1 rounded"
-                        onClick={() =>
-                          alert(
-                            `Message sent to ${client.name} ${client.lastName}`
-                          )
-                        }
-                      >
-                        Message
-                      </button>
+                      {new Date(client.created_at).toLocaleDateString()}
                     </td>
                   </tr>
                 ))}
@@ -465,13 +402,12 @@ const Dashboard = () => {
             <h2 className="text-lg font-semibold text-gray-800">
               Latest Delivery Men
             </h2>
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
+            <Link
+              to="/admin/livreurlist"
+              className="text-sm text-green-600 hover:text-green-700 font-medium"
+            >
+              View All
+            </Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -492,58 +428,33 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {paginatedUsers.length > 0 ? (
-                  paginatedUsers.map((user) => (
+                {deliveryMen.length > 0 ? (
+                  deliveryMen.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-medium text-gray-900">
                         {user.id}
                       </td>
-                      <td className="px-6 py-4 text-gray-700">{user.name}</td>
+                      <td className="px-6 py-4 text-gray-700">{user.nom}</td>
                       <td className="px-6 py-4 text-gray-500">
-                        {user.idregion}
+                        {user.region_id}
                       </td>
-                      <td className="px-6 py-4 text-gray-500">{user.region}</td>
+                      <td className="px-6 py-4 text-gray-500">
+                        {user.region?.nom || "-"}
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td
-                      colSpan="3"
+                      colSpan="4"
                       className="px-6 py-4 text-center text-gray-500"
                     >
-                      No users found.
+                      No delivery men found.
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
-          </div>
-          <div className="flex justify-between items-center px-6 py-4">
-            <button
-              onClick={handlePrev}
-              disabled={page === 1}
-              className={`px-3 py-1 rounded-md text-sm font-medium ${
-                page === 1
-                  ? "bg-gray-200 text-gray-500"
-                  : "bg-green-500 text-white hover:bg-green-600"
-              }`}
-            >
-              Previous
-            </button>
-            <span className="text-sm text-gray-700">
-              Page {page} of {totalPages}
-            </span>
-            <button
-              onClick={handleNext}
-              disabled={page === totalPages}
-              className={`px-3 py-1 rounded-md text-sm font-medium ${
-                page === totalPages
-                  ? "bg-gray-200 text-gray-500"
-                  : "bg-green-500 text-white hover:bg-green-600"
-              }`}
-            >
-              Next
-            </button>
           </div>
         </div>
       </div>

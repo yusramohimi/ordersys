@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import SideBar from "../../components/SideBar"; 
+import SideBar from "../Admin/SideBar"; 
 
 const Product = () => {
   const [Products, setProducts] = useState([]);
