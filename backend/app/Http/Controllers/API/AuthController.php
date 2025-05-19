@@ -58,4 +58,13 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Identifiants invalides'], 401);
     }
+    public function logout(Request $request)
+    {
+        // Révoque le token actuel de l'utilisateur
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Déconnexion réussie',
+        ]);
+    }
 }
