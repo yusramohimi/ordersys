@@ -344,8 +344,7 @@ const Dashboard = () => {
             </table>
           </div>
         </div>
-        {/* Latest Clients */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 mt-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6">
           <div className="p-5 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-800">
               Latest Clients

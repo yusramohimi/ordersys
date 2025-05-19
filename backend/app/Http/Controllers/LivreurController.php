@@ -22,7 +22,7 @@ class LivreurController extends Controller
 
 
         $livreur = new Livreur();
-        $livreur->nom = $validated['nom']; 
+        $livreur->nom = $validated['nom'];
         $livreur->email = $validated['email'];
         $livreur->telephone = $validated['telephone'];
         $livreur->password = Hash::make($validated['password']);
@@ -32,4 +32,16 @@ class LivreurController extends Controller
 
         return response()->json(['message' => 'Livreur ajouté avec succès'], 201);
     }
+    public function index()
+    {
+        return Livreur::with('region')->get();
+    }
+    public function latest()
+    {
+        return Livreur::with('region')
+        ->orderBy('id', 'desc')
+        ->limit(5)
+        ->get();
+    }
+    
 }
