@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
+
 import SideBar from "./components/SideBar";
 import Dashboard from "./pages/Admin/Dashboard";
 import Login from "./pages/Login";
@@ -8,6 +9,7 @@ import Stock from "./pages/Admin/Stock";
 import Client from "./pages/Client/Client";
 import OrderList from "./pages/Admin/OrderList";
 import ClientsList from "./pages/Admin/ClientsList";
+import AddLivreur from "./pages/Admin/AddLivreur";
 
 function App() {
   const { user } = useSelector((state) => state.auth);
@@ -25,6 +27,7 @@ function App() {
             <Route path="/client" element={<Client />} />
             <Route path="/orders/admin" element={<OrderList />} />
             <Route path="/clients-list" element={<ClientsList/>}/>
+            <Route path="/admin/livreurs" element={<AddLivreur/>}/>
           </Routes>
         </div>
       </div>

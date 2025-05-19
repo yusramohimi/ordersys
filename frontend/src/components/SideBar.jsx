@@ -1,8 +1,10 @@
 import { FaShoppingCart, FaPlusCircle, FaUsers, FaBoxOpen, FaWarehouse, FaTruck, FaHockeyPuck, FaSignOutAlt } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate  } from "react-router-dom";
 import axios from "axios";
 
 function SideBar() {
+  const navigate = useNavigate();
+
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -15,7 +17,7 @@ function SideBar() {
       });
 
       localStorage.removeItem('token');
-      navigate('/login');
+      navigate('/login');  // redirection après logout
     } catch (error) {
       console.error("Erreur lors du logout", error);
     }
@@ -30,7 +32,7 @@ function SideBar() {
       {/* Navigation Links */}
       <nav className="flex-1 space-y-2">
         <NavLink 
-          to="/dashboard" 
+          to="/dashboard/admin" 
           className={({ isActive }) => 
             `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
             ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
@@ -52,7 +54,7 @@ function SideBar() {
         </NavLink>
 
         <NavLink 
-          to="/achatform" 
+          to="/admin/livreurs" 
           className={({ isActive }) => 
             `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
             ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
