@@ -105,7 +105,6 @@ function SideBar() {
           <FaWarehouse className="text-lg" /> 
           <span>Stock</span>
         </NavLink>
-<<<<<<< HEAD:frontend/src/components/SideBar.jsx
 
         <NavLink 
           to="/fournisseur" 
@@ -129,8 +128,7 @@ function SideBar() {
           <span>Admin Logs</span>
       </NavLink>
 
-=======
->>>>>>> 026e28d40d7c6f8bde581d3f880a4b4e64ddbd8a:frontend/src/pages/Admin/SideBar.jsx
+
         {/* Logout Button */}
         <button
           onClick={handleLogout}
