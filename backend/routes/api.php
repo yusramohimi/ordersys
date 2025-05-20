@@ -9,10 +9,17 @@ use App\Http\Controllers\API\CommandeController;
 use App\Http\Controllers\LivreurController;
 use App\Http\Controllers\API\AdminLogController;
 use App\Http\Controllers\API\AdminLogExportController;
-
+use App\Http\Controllers\ClientController;
 
 
 Route::post('/admin/livreurs', [LivreurController::class, 'store']);
+Route::get('/admin/livreurlist', [LivreurController::class, 'index']);
+Route::get('/admin/livreurlist/latest', [LivreurController::class, 'latest']);
+
+
+Route::get('/admin/clientslist', [ClientController::class, 'index']);
+Route::delete('admin/clientslist/{id}', [ClientController::class, 'destroy']);
+Route::get('/admin/clientslist/latest', [ClientController::class, 'latest']);
 
 Route::get('/user', function (Request $request) {
     return $request->user();

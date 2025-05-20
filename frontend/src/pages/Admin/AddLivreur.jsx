@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import SideBar from "../../components/SideBar";
+import SideBar from "./SideBar";
 
 const AddLivreur = () => {
   const [formData, setFormData] = useState({

@@ -32,7 +32,7 @@ function SideBar() {
       {/* Navigation Links */}
       <nav className="flex-1 space-y-2">
         <NavLink 
-          to="/dashboard/admin" 
+          to="/admin/dashboard" 
           className={({ isActive }) => 
             `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
             ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
@@ -43,7 +43,7 @@ function SideBar() {
         </NavLink>
 
         <NavLink 
-          to="/orders/admin" 
+          to="/admin/orders" 
           className={({ isActive }) => 
             `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
             ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
@@ -65,16 +65,25 @@ function SideBar() {
         </NavLink>
 
         <NavLink 
-          to="/clients-list" 
+          to="/admin/clientslist" 
           className={({ isActive }) => 
             `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
             ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
           }
         >
           <FaUsers className="text-lg" /> 
-          <span>Clients</span>
+          <span>Clients List</span>
         </NavLink>
-
+        <NavLink 
+          to="/admin/livreurlist" 
+          className={({ isActive }) => 
+            `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
+            ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
+          }
+        >
+          <FaTruck className="text-lg" /> 
+          <span>Delivery Men List</span>
+        </NavLink>
         <NavLink 
           to="/article" 
           className={({ isActive }) => 
@@ -96,6 +105,7 @@ function SideBar() {
           <FaWarehouse className="text-lg" /> 
           <span>Stock</span>
         </NavLink>
+<<<<<<< HEAD:frontend/src/components/SideBar.jsx
 
         <NavLink 
           to="/fournisseur" 
@@ -119,6 +129,8 @@ function SideBar() {
           <span>Admin Logs</span>
       </NavLink>
 
+=======
+>>>>>>> 026e28d40d7c6f8bde581d3f880a4b4e64ddbd8a:frontend/src/pages/Admin/SideBar.jsx
         {/* Logout Button */}
         <button
           onClick={handleLogout}
