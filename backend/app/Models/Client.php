@@ -13,7 +13,14 @@ class Client extends Authenticatable
     use HasApiTokens, Notifiable;
 
     protected $fillable = [
-        'nom', 'prenom', 'telephone', 'email', 'ville', 'region_id', 'adresse', 'password'
+        'nom',
+        'prenom',
+        'telephone',
+        'email',
+        'ville',
+        'region_id',
+        'adresse',
+        'password'
     ];
 
     public function region(): BelongsTo
@@ -24,5 +31,10 @@ class Client extends Authenticatable
     public function commandes(): HasMany
     {
         return $this->hasMany(Commande::class);
+    }
+    
+    public function getNomCompletAttribute()
+    {
+        return "{$this->prenom} {$this->nom}";
     }
 }

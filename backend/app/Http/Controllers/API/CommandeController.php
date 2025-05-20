@@ -88,10 +88,13 @@ class CommandeController extends Controller
             $result = $commandes->map(function ($cmd) {
                 return [
                     'id' => $cmd->id,
-                    'client_name' => $cmd->client->nom . ' ' . $cmd->client->prenom,
-                    'created_at' => $cmd->created_at->toDateTimeString(),
-                    'amount' => '$' . number_format($cmd->prix_total ?? 0, 2),
+                    'client_id' => $cmd->client_id,
+                    'client_name' => $cmd->client ? $cmd->client->nom_complet : null,
+                    'adresse' => $cmd->client ? $cmd->client->adresse : null,
+                    'prix_total' => $cmd->prix_total,
                     'status' => $cmd->statut,
+                    'created_at' => $cmd->created_at,
+                    'heure_estimee_livraison' => $cmd->heure_estimee_livraison,
                 ];
             });
 
@@ -101,6 +104,25 @@ class CommandeController extends Controller
             return response()->json(['error' => 'Erreur serveur'], 500);
         }
     }
+    public function updateStatus($id, Request $request)
+    {
+        // Valider le statut reçu
+        $request->validate([
+            'statut' => 'required|string|in:en_attente,en_cours,livree,annulee' // adapte selon tes statuts
+        ]);
+
+        try {
+            $commande = Commande::findOrFail($id);
+            $commande->statut = $request->statut;
+            $commande->save();
+
+            return response()->json(['message' => 'Statut de la commande mis à jour.', 'statut' => $commande->statut]);
+        } catch (\Exception $e) {
+            Log::error('Erreur mise à jour statut commande : ' . $e->getMessage());
+            return response()->json(['error' => 'Erreur serveur lors de la mise à jour du statut'], 500);
+        }
+    }
+
 
     public function destroy($id)
     {

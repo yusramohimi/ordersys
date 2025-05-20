@@ -38,6 +38,19 @@ Route::delete('/admin/orders/{id}', [CommandeController::class, 'destroy']);
 Route::get('/admin/stock', [StockMovementController::class, 'index']);
 Route::post('/admin/stock', [StockMovementController::class, 'store']);
 
+// Routes Livreurs
+Route::get('/livreur/orders', [CommandeController::class, 'index']);
+Route::middleware('auth:sanctum')->get('/livreur/commandes', [CommandeController::class, 'index']);
+Route::put('/livreur/orders/{id}/update-time', function ($id, Request $request) {
+    $commande = \App\Models\Commande::findOrFail($id);
+    $commande->heure_estimee_livraison = $request->heure_estimee_livraison;
+    $commande->save();
+
+    return response()->json(['message' => 'Heure de livraison mise à jour.']);
+});
+Route::put('/livreur/orders/{id}/update-status', [CommandeController::class, 'updateStatus']);
+
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
