@@ -37,7 +37,7 @@ export default function Login() {
         localStorage.setItem("role", result.user_type);
         localStorage.setItem("user", JSON.stringify(result.user));
         setLoginError("");
-        window.location.href = `/dashboard/${result.user_type}`;
+        window.location.href = `/${result.user_type}/dashboard`;
       } else {
         setLoginError(result.message || "Erreur d'identifiants");
       }
