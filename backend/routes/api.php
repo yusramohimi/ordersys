@@ -35,8 +35,11 @@ Route::get('/admin/orders', [CommandeController::class, 'index']);
 Route::delete('/admin/orders/{id}', [CommandeController::class, 'destroy']);
 
 
-Route::get('/admin/stock', [StockMovementController::class, 'index']);
-Route::post('/admin/stock', [StockMovementController::class, 'store']);
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/admin/stock', [StockMovementController::class, 'index']);
+    Route::post('/admin/stock', [StockMovementController::class, 'store']);
+});
 
 Route::get('/user', function (Request $request) {
     return $request->user();
