@@ -27,6 +27,8 @@ function App() {
             <Route path="//admin/orders" element={<OrderList />} />
             <Route path="/admin/clientslist" element={<ClientsList/>}/>
             <Route path="/admin/livreurs" element={<AddLivreur/>}/>
+            <Route path="/admin/livreurslist" element={<LivreurList/>}/>
+             <Route path="/admin/logs" element={<AdminLogs/>}/>
           </Routes>
         </div>
       </div>
