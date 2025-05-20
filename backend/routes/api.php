@@ -7,7 +7,10 @@ use App\Models\Region;
 use App\Models\CodePromo;
 use App\Http\Controllers\API\CommandeController;
 use App\Http\Controllers\LivreurController;
+use App\Http\Controllers\API\AdminLogController;
+use App\Http\Controllers\API\AdminLogExportController;
 use App\Http\Controllers\ClientController;
+
 
 Route::post('/admin/livreurs', [LivreurController::class, 'store']);
 Route::get('/admin/livreurlist', [LivreurController::class, 'index']);
@@ -53,3 +56,5 @@ Route::post('/commander', [CommandeController::class, 'commander']);
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+Route::get('/admin-logs', [AdminLogController::class, 'index'])->middleware('auth:sanctum');
+Route::get('/admin-logs/export-csv', [AdminLogExportController::class, 'exportCsv']);
