@@ -12,13 +12,19 @@ const StockMovement = () => {
   });
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/admin/produits')
-      .then(res => {
-        // Suppression des doublons par ID (au cas où)
-        const uniqueProduits = Array.from(new Map(res.data.map(item => [item.id, item])).values());
-        setProduits(uniqueProduits);
-      })
-      .catch(err => console.error(err));
+    const token = localStorage.getItem('token');
+
+    axios.get('http://localhost:8000/api/admin/produits', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      withCredentials: true
+    })
+    .then(res => {
+      const uniqueProduits = Array.from(new Map(res.data.map(item => [item.id, item])).values());
+      setProduits(uniqueProduits);
+    })
+    .catch(err => console.error('Erreur chargement produits:', err));
   }, []);
 
   const handleChange = e => {
@@ -29,11 +35,20 @@ const StockMovement = () => {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8000/api/admin/stock', formData);
+      const token = localStorage.getItem('token');
+
+      await axios.post('http://localhost:8000/api/admin/stock', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
+
       alert('Mouvement de stock enregistré avec succès.');
       setFormData({ produit_id: '', type: '', quantite: '', motif: '' });
     } catch (err) {
-      alert('Erreur lors de l\'enregistrement du mouvement.');
+      alert("Erreur lors de l'enregistrement du mouvement.");
       console.error(err);
     }
   };
@@ -44,7 +59,7 @@ const StockMovement = () => {
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         <div className="bg-white shadow-md rounded-2xl p-8 w-full max-w-xl">
           <h2 className="text-2xl font-bold text-center text-green-600 mb-6">
-            Add a Stock Mouvement
+            Ajouter un Mouvement de Stock
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -59,7 +74,7 @@ const StockMovement = () => {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                 required
               >
-                <option value="">-- Select a product --</option>
+                <option value="">-- Sélectionner un produit --</option>
                 {produits.map(produit => (
                   <option key={produit.id} value={produit.id}>{produit.nom}</option>
                 ))}
@@ -68,7 +83,7 @@ const StockMovement = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Mouvement Type
+                Type de Mouvement
               </label>
               <select
                 name="type"
@@ -77,16 +92,16 @@ const StockMovement = () => {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                 required
               >
-                <option value="">-- Select a type --</option>
-                <option value="entrée">Entry</option>
-                <option value="sortie">Exit</option>
-                <option value="ajustement">Adjustement</option>
+                <option value="">-- Sélectionner un type --</option>
+                <option value="entrée">Entrée</option>
+                <option value="sortie">Sortie</option>
+                <option value="ajustement">Ajustement</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Quantity
+                Quantité
               </label>
               <input
                 type="number"
@@ -116,7 +131,7 @@ const StockMovement = () => {
                 type="submit"
                 className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-all"
               >
-                Save
+                Enregistrer
               </button>
             </div>
           </form>
