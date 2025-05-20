@@ -7,9 +7,12 @@ use App\Models\Livreur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Traits\LogsAdminActions;
 
 class LivreurController extends Controller
 {
+    use LogsAdminActions;
+    
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -29,6 +32,13 @@ class LivreurController extends Controller
         $livreur->region_id = $validated['region_id']; // ✅ récupéré dynamiquement
 
         $livreur->save();
+        
+        $this->logAdminAction(
+            'create',
+            'Livreur',
+            $livreur->id,
+            ['nom' => $livreur->nom]
+        );
 
         return response()->json(['message' => 'Livreur ajouté avec succès'], 201);
     }

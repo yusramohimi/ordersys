@@ -1,4 +1,4 @@
-import { FaShoppingCart, FaPlusCircle, FaUsers, FaBoxOpen, FaWarehouse, FaTruck, FaHockeyPuck, FaSignOutAlt } from "react-icons/fa";
+import { FaShoppingCart, FaPlusCircle, FaUsers, FaBoxOpen, FaWarehouse, FaTruck, FaHockeyPuck, FaSignOutAlt,FaClipboardList } from "react-icons/fa";
 import { NavLink, useNavigate  } from "react-router-dom";
 import axios from "axios";
 
@@ -107,6 +107,18 @@ function SideBar() {
           <FaTruck className="text-lg" /> 
           <span>Delivery</span>
         </NavLink>
+
+        <NavLink 
+          to="/admin/logs" 
+          className={({ isActive }) => 
+            `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
+            ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
+          }
+        >
+          <FaClipboardList className="text-lg" /> 
+          <span>Admin Logs</span>
+      </NavLink>
+
         {/* Logout Button */}
         <button
           onClick={handleLogout}
