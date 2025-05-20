@@ -120,15 +120,7 @@ export default function Login() {
           </div>
         </form>
 
-        <div className="text-center text-sm">
-          <span className="text-gray-600">Pas encore de compte ? </span>
-          <a
-            href="/signup"
-            className="font-medium text-green-600 hover:text-green-700"
-          >
-            S'inscrire
-          </a>
-        </div>
+        
       </div>
     </motion.div>
   );
