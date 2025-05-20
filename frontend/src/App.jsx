@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import SideBar from "./pages/Admin/SideBar";
 import Dashboard from "./pages/Admin/Dashboard";
 import Login from "./pages/Login";
-import Stock from "./pages/Admin/Stock";
+import Stock from "./pages/Admin/StockMovement";
 import OrderList from "./pages/Admin/OrderList";
 import ClientsList from "./pages/Admin/ClientsList";
 import AddLivreur from "./pages/Admin/AddLivreur";
@@ -21,7 +21,7 @@ function App() {
             <Route path="/" element={<Login />} />
             <Route path="/admin/dashboard" element={<Dashboard />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/stock" element={<Stock />} />
+            <Route path="/admin/stock" element={<Stock />} />
             <Route path="/admin/orders" element={<OrderList />} />
             <Route path="/admin/clientslist" element={<ClientsList/>}/>
             <Route path="/admin/livreurs" element={<AddLivreur/>}/>

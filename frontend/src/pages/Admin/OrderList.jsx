@@ -37,14 +37,14 @@ const OrderList = () => {
       </div>
 
       <div className="flex-1 p-6 overflow-auto">
-        <h1 className="text-2xl font-semibold text-gray-800 mb-6">Order List</h1>
+        <h1 className="text-2xl font-semibold text-gray-800 mb-6">Orders List</h1>
 
         <div className="bg-white shadow rounded-lg overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
                 {[
-                  "Transaction ID",
+                  "Order ID",
                   "Client",
                   "Date",
                   "Amount",

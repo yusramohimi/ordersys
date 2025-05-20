@@ -45,7 +45,7 @@ const ClientList = () => {
 
       {/* Contenu principal */}
       <div className="flex-1 p-6 overflow-auto">
-        <h1 className="text-2xl font-semibold text-gray-800 mb-6">Liste des Clients</h1>
+        <h1 className="text-2xl font-semibold text-gray-800 mb-6">Clients List</h1>
 
         <div className="bg-white shadow rounded-lg overflow-x-auto">
           <table className="w-full text-sm">
@@ -53,13 +53,13 @@ const ClientList = () => {
               <tr>
                 {[
                   "ID",
-                  "Prénom",
-                  "Nom",
+                  "Name",
+                  "Last Name",
                   "Email",
-                  "Ville",
-                  "Région",
-                  "Adresse",
-                  "Créé le",
+                  "City",
+                  "Region",
+                  "Adress",
+                  "Created",
                   "Action",
                 ].map((header, i) => (
                   <th

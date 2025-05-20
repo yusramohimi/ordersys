@@ -8,7 +8,7 @@ export default function AdminLogs() {
   const [perPage] = useState(5);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/admin-logs`, {
+    fetch(`http://localhost:8000/api/admin-logs`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -24,7 +24,7 @@ export default function AdminLogs() {
   const totalPages = Math.ceil(logs.length / perPage);
 
   const exportCSV = () => {
-    window.open('http://127.0.0.1:8000/api/admin-logs/export-csv', '_blank');
+    window.open('http://localhost:8000/api/admin-logs/export-csv', '_blank');
   };
 
   const getActionStyle = (action) => {

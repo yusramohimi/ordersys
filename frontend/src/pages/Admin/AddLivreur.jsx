@@ -110,12 +110,12 @@ const AddLivreur = () => {
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         <div className="bg-white shadow-md rounded-2xl p-8 w-full max-w-md">
           <h2 className="text-2xl font-bold text-center text-green-600 mb-6">
-            Ajouter un livreur
+            Add a Delivery Man
           </h2>
 
           {formSubmitted && (
             <div className="mb-4 text-green-600 text-center font-semibold">
-              Livreur ajouté avec succès !
+              Added successfully !
             </div>
           )}
 
@@ -131,7 +131,7 @@ const AddLivreur = () => {
                 htmlFor="nom"
                 className="block text-sm font-medium text-gray-700"
               >
-                Nom
+                Full Name
               </label>
               <input
                 type="text"
@@ -175,7 +175,7 @@ const AddLivreur = () => {
                 htmlFor="telephone"
                 className="block text-sm font-medium text-gray-700"
               >
-                Téléphone
+                Phone
               </label>
               <input
                 type="text"
@@ -197,7 +197,7 @@ const AddLivreur = () => {
                 htmlFor="region_id"
                 className="block text-sm font-medium text-gray-700"
               >
-                Région
+                Region
               </label>
               <select
                 name="region_id"
@@ -208,7 +208,7 @@ const AddLivreur = () => {
                   errors.region_id ? "border-red-500" : "border-gray-300"
                 } rounded-md shadow-sm`}
               >
-                <option value="">-- Sélectionner une région --</option>
+                <option value="">-- Select a region --</option>
                 {regions.map((region) => (
                   <option key={region.id} value={region.id}>
                     {region.nom}
@@ -225,7 +225,7 @@ const AddLivreur = () => {
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700"
               >
-                Mot de passe
+                Password
               </label>
               <input
                 type="password"

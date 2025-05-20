@@ -50,7 +50,7 @@ function SideBar() {
           }
         >
           <FaShoppingCart className="text-lg" /> 
-          <span>Order List</span>
+          <span>Orders List</span>
         </NavLink>
 
         <NavLink 
@@ -75,7 +75,7 @@ function SideBar() {
           <span>Clients List</span>
         </NavLink>
         <NavLink 
-          to="/admin/livreurlist" 
+          to="/admin/livreurslist" 
           className={({ isActive }) => 
             `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
             ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
@@ -86,26 +86,16 @@ function SideBar() {
         </NavLink>
         
         <NavLink 
-          to="/stock" 
+          to="/admin/stock" 
           className={({ isActive }) => 
             `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
             ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
           }
         >
           <FaWarehouse className="text-lg" /> 
-          <span>Stock</span>
+          <span>Stock Movement</span>
         </NavLink>
 
-        <NavLink 
-          to="/fournisseur" 
-          className={({ isActive }) => 
-            `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
-            ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
-          }
-        >
-          <FaTruck className="text-lg" /> 
-          <span>Delivery</span>
-        </NavLink>
 
         <NavLink 
           to="/admin/logs" 
