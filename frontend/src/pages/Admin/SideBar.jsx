@@ -84,17 +84,7 @@ function SideBar() {
           <FaTruck className="text-lg" /> 
           <span>Delivery Men List</span>
         </NavLink>
-        <NavLink 
-          to="/article" 
-          className={({ isActive }) => 
-            `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
-            ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
-          }
-        >
-          <FaBoxOpen className="text-lg" /> 
-          <span>Products</span>
-        </NavLink>
-
+        
         <NavLink 
           to="/stock" 
           className={({ isActive }) => 
