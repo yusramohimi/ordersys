@@ -10,12 +10,22 @@ use App\Http\Controllers\LivreurController;
 use App\Http\Controllers\API\AdminLogController;
 use App\Http\Controllers\API\AdminLogExportController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\API\StockMovementController;
+use App\Http\Controllers\API\ProduitController;
 
+ 
+
+
+//Routes de l'Admin
+Route::get('/admin/produits', [ProduitController::class, 'index']);
+Route::get('/admin/produits/{id}', [ProduitController::class, 'show']); 
 
 Route::post('/admin/livreurs', [LivreurController::class, 'store']);
 Route::get('/admin/livreurlist', [LivreurController::class, 'index']);
 Route::get('/admin/livreurlist/latest', [LivreurController::class, 'latest']);
 
+Route::get('/admin-logs', [AdminLogController::class, 'index'])->middleware('auth:sanctum');
+Route::get('/admin-logs/export-csv', [AdminLogExportController::class, 'exportCsv']);
 
 Route::get('/admin/clientslist', [ClientController::class, 'index']);
 Route::delete('admin/clientslist/{id}', [ClientController::class, 'destroy']);
@@ -23,6 +33,10 @@ Route::get('/admin/clientslist/latest', [ClientController::class, 'latest']);
 
 Route::get('/admin/orders', [CommandeController::class, 'index']);
 Route::delete('/admin/orders/{id}', [CommandeController::class, 'destroy']);
+
+
+Route::get('/admin/stock', [StockMovementController::class, 'index']);
+Route::post('/admin/stock', [StockMovementController::class, 'store']);
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -56,5 +70,4 @@ Route::post('/commander', [CommandeController::class, 'commander']);
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
-Route::get('/admin-logs', [AdminLogController::class, 'index'])->middleware('auth:sanctum');
-Route::get('/admin-logs/export-csv', [AdminLogExportController::class, 'exportCsv']);
+
