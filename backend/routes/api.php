@@ -18,6 +18,9 @@ Route::get('/admin/clientslist', [ClientController::class, 'index']);
 Route::delete('admin/clientslist/{id}', [ClientController::class, 'destroy']);
 Route::get('/admin/clientslist/latest', [ClientController::class, 'latest']);
 
+Route::get('/admin/orders', [CommandeController::class, 'index']);
+Route::delete('/admin/orders/{id}', [CommandeController::class, 'destroy']);
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');

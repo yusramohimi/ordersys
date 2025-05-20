@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
-      
+
 
         $this->call([
             RegionSeeder::class,
@@ -28,8 +28,8 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             ClientSeeder::class,
             LivreurSeeder::class,
+            CommandeSeeder::class,
+
         ]);
-
-
     }
 }
