@@ -11,6 +11,7 @@ import LivreurList from "./pages/Admin/LivreurList";
 import AdminLogs from "./pages/Admin/adminLogs";
 import OrderListLiv from "./pages/Livreur/OrderListLiv";
 import DashboardLiv from "./pages/Livreur/DashboardLiv";
+import StockMovement from "./pages/Admin/StockMovement";
 
 function App() {
   const { user } = useSelector((state) => state.auth);
@@ -31,7 +32,7 @@ function App() {
             <Route path="/admin/logs" element={<AdminLogs />} />
             <Route path="/livreur/orders" element={<OrderListLiv />} />
             <Route path="/livreur/dashboard" element={<DashboardLiv />} />
-            <Route path="/admin/stock" element={<Stock/>}/>
+            <Route path="/admin/stock" element={<StockMovement/>}/>
           </Routes>
         </div>
       </div>
