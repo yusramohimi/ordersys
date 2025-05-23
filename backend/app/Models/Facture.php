@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Facture extends Model
 {
-    protected $fillable = ['commande_id', 'pdf_path', 'date_generation'];
+    protected $fillable = ['commande_id'];
 
     public function commande(): BelongsTo
     {
         return $this->belongsTo(Commande::class);
     }
 }
+
 

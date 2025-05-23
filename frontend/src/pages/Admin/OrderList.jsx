@@ -1,27 +1,24 @@
 import React, { useEffect, useState } from "react";
 import SideBar from "./SideBar";
+import FactureModal from "../FactureModal"; // <-- Assure-toi que le nom est bien le bon
 
 const OrderList = () => {
   const [transactions, setTransactions] = useState([]);
+  const [selectedCommande, setSelectedCommande] = useState(null);
 
   useEffect(() => {
     fetch("http://localhost:8000/api/admin/orders")
       .then((res) => res.json())
-      .then((data) => {
-        
-        setTransactions(data);
-      })
+      .then((data) => setTransactions(data))
       .catch((err) => console.error(err));
   }, []);
 
-  // Fonction pour supprimer une commande
   const handleCancel = (id) => {
     fetch(`http://localhost:8000/api/admin/orders/${id}`, {
       method: "DELETE",
     })
       .then((res) => {
         if (res.ok) {
-          // Met à jour la liste après suppression
           setTransactions((prev) => prev.filter((txn) => txn.id !== id));
         } else {
           alert("Erreur lors de la suppression");
@@ -43,14 +40,7 @@ const OrderList = () => {
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                {[
-                  "Order ID",
-                  "Client",
-                  "Date",
-                  "Amount",
-                  "Status",
-                  "Action",
-                ].map((header, i) => (
+                {["Order ID", "Client", "Date", "Amount", "Status", "Action"].map((header, i) => (
                   <th
                     key={i}
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -82,13 +72,20 @@ const OrderList = () => {
                       {txn.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 space-x-2">
                     <button
                       type="button"
                       className="border border-red-500 text-red-600 hover:bg-red-50 text-xs px-3 py-1 rounded-md transition-all"
                       onClick={() => handleCancel(txn.id)}
                     >
                       Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCommande(txn.id)}
+                      className="bg-green-600 text-white hover:bg-green-700 text-xs px-3 py-1 rounded-md transition-all"
+                    >
+                      Invoice
                     </button>
                   </td>
                 </tr>
@@ -104,6 +101,13 @@ const OrderList = () => {
           </table>
         </div>
       </div>
+
+      {selectedCommande && (
+        <FactureModal
+          commandeId={selectedCommande}
+          onClose={() => setSelectedCommande(null)}
+        />
+      )}
     </div>
   );
 };
