@@ -9,12 +9,17 @@ const DashboardLiv = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
       .get("http://localhost:8000/api/livreur/orders")
       .then((res) => {
-        setOrders(res.data);
+        // On trie les commandes par date décroissante (si applicable)
+        const sortedOrders = res.data.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+        setOrders(sortedOrders);
         setLoading(false);
       })
       .catch((err) => {
@@ -52,7 +57,28 @@ const DashboardLiv = () => {
     const date = new Date(dateStr);
     return date.toLocaleDateString() + " " + date.toLocaleTimeString();
   };
-
+  const getStatusStyle = (statut) => {
+    switch (statut.toLowerCase()) {
+      case "en_attente":
+        return "bg-yellow-100 text-yellow-800";
+      case "confirmee":
+        return "bg-blue-100 text-blue-800";
+      case "en_cours":
+        return "bg-purple-100 text-purple-800";
+      case "en_livraison":
+        return "bg-indigo-100 text-indigo-800";
+      case "livree":
+      case "livrée":
+        return "bg-green-100 text-green-800";
+      case "retour":
+        return "bg-orange-100 text-orange-800";
+      case "annulee":
+      case "annulée":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -257,21 +283,16 @@ const DashboardLiv = () => {
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  {[
-                    "Order ID",
-                    "Client",
-                    "Date",
-                    "prix_total",
-                    "Status",
-                    "Actions",
-                  ].map((header, i) => (
-                    <th
-                      key={i}
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      {header}
-                    </th>
-                  ))}
+                  {["Order ID", "Client", "Date", "prix_total", "Status"].map(
+                    (header, i) => (
+                      <th
+                        key={i}
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        {header}
+                      </th>
+                    )
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -282,47 +303,31 @@ const DashboardLiv = () => {
                     </td>
                   </tr>
                 ) : (
-                  orders.map((order, i) => (
+                  orders.slice(0, 5).map((order, i) => (
                     <tr key={i} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-medium text-gray-900">
                         {order.id}
                       </td>
-                      <td className="px-6 py-4 text-gray-500 cursor-pointer underline"
-                          onClick={() => setSelectedOrder(order)}
+                      <td
+                        className="px-6 py-4 text-gray-500 cursor-pointer underline"
+                        onClick={() => setSelectedOrder(order)}
                       >
                         {order.client_name}
                       </td>
                       <td className="px-6 py-4 text-gray-500">
                         {formatDate(order.created_at)}
                       </td>
-                      <td className="px-6 py-4 text-gray-500">${order.prix_total}</td>
+                      <td className="px-6 py-4 text-gray-500">
+                        {order.prix_total} DH
+                      </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            order.status === "Completed"
-                              ? "bg-green-100 text-green-800"
-                              : order.status === "Pending"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusStyle(
+                            order.statut
+                          )}`}
                         >
-                          {order.status}
+                          {order.statut}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 text-gray-500 flex space-x-2">
-                        <button
-                          className="hover:text-green-600"
-                          onClick={() => alert(`Edit order ${order.id}`)}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          className="hover:text-red-600"
-                          onClick={() => alert(`Delete order ${order.id}`)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      
                       </td>
                     </tr>
                   ))

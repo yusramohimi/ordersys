@@ -32,6 +32,7 @@ function App() {
             <Route path="/admin/logs" element={<AdminLogs />} />
             <Route path="/livreur/orders" element={<OrderListLiv />} />
             <Route path="/livreur/dashboard" element={<DashboardLiv />} />
+            <Route path="/admin/stock" element={<Stock/>}/>
           </Routes>
         </div>
       </div>
