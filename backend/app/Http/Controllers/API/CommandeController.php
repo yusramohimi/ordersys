@@ -92,7 +92,7 @@ class CommandeController extends Controller
                     'client_name' => $cmd->client ? $cmd->client->nom_complet : null,
                     'adresse' => $cmd->client ? $cmd->client->adresse : null,
                     'prix_total' => $cmd->prix_total,
-                    'status' => $cmd->statut,
+                    'statut' => $cmd->statut,
                     'created_at' => $cmd->created_at,
                     'heure_estimee_livraison' => $cmd->heure_estimee_livraison,
                 ];
@@ -106,9 +106,9 @@ class CommandeController extends Controller
     }
     public function updateStatus($id, Request $request)
     {
-        // Valider le statut reçu
+        // Valider le status reçu
         $request->validate([
-            'statut' => 'required|string|in:en_attente,en_cours,livree,annulee' // adapte selon tes statuts
+            'statut' => 'required|string|in:en_attente,confirmee,en_cours,livree,retour,annulee' 
         ]);
 
         try {

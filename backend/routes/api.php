@@ -33,6 +33,13 @@ Route::get('/admin/clientslist/latest', [ClientController::class, 'latest']);
 
 Route::get('/admin/orders', [CommandeController::class, 'index']);
 Route::delete('/admin/orders/{id}', [CommandeController::class, 'destroy']);
+Route::put('/admin/orders/{id}/update', function ($id, Request $request) {
+    $commande = \App\Models\Commande::findOrFail($id);
+    $commande->heure_estimee_livraison = $request->heure_estimee_livraison;
+    $commande->save();
+
+    return response()->json(['message' => 'Heure de livraison mise à jour.']);
+});
 
 
 
@@ -44,7 +51,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 // Routes Livreurs
 Route::get('/livreur/orders', [CommandeController::class, 'index']);
 Route::middleware('auth:sanctum')->get('/livreur/commandes', [CommandeController::class, 'index']);
-Route::put('/livreur/orders/{id}/update-time', function ($id, Request $request) {
+Route::put('/livreur/orders/{id}/update', function ($id, Request $request) {
     $commande = \App\Models\Commande::findOrFail($id);
     $commande->heure_estimee_livraison = $request->heure_estimee_livraison;
     $commande->save();
