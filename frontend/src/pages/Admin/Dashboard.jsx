@@ -7,6 +7,8 @@ import SideBar from "./SideBar";
 const Dashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [clients, setClients] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("http://localhost:8000/api/admin/clientslist/latest")
@@ -232,13 +234,14 @@ const Dashboard = () => {
         </div>
 
         {/* Orders */}
+        {/* Orders */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="p-5 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-800">
               Recent Orders
             </h2>
             <Link
-              to="/admin/orders"
+              to="/livreur/orders"
               className="text-sm text-green-600 hover:text-green-700 font-medium"
             >
               View All
@@ -248,93 +251,55 @@ const Dashboard = () => {
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  {[
-                    "Transaction ID",
-                    "Client",
-                    "Date",
-                    "Amount",
-                    "Status",
-                    "Action",
-                  ].map((header, i) => (
-                    <th
-                      key={i}
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      {header}
-                    </th>
-                  ))}
+                  {["Order ID", "Client", "Date", "prix_total", "Status"].map(
+                    (header, i) => (
+                      <th
+                        key={i}
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        {header}
+                      </th>
+                    )
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {[
-                  {
-                    id: "#TRX7891",
-                    name: "Alex Johnson",
-                    date: "15 May, 2023",
-                    amount: "$245.00",
-                    status: "Completed",
-                  },
-                  {
-                    id: "#TRX7890",
-                    name: "Maria Garcia",
-                    date: "14 May, 2023",
-                    amount: "$189.50",
-                    status: "Pending",
-                  },
-                  {
-                    id: "#TRX7889",
-                    name: "David Wilson",
-                    date: "14 May, 2023",
-                    amount: "$320.75",
-                    status: "Completed",
-                  },
-                  {
-                    id: "#TRX7888",
-                    name: "Sarah Miller",
-                    date: "13 May, 2023",
-                    amount: "$95.20",
-                    status: "Failed",
-                  },
-                  {
-                    id: "#TRX7887",
-                    name: "James Brown",
-                    date: "12 May, 2023",
-                    amount: "$450.00",
-                    status: "Completed",
-                  },
-                ].map((txn, i) => (
-                  <tr key={i} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-900">
-                      {txn.id}
-                    </td>
-                    <td className="px-6 py-4 text-gray-500">{txn.name}</td>
-                    <td className="px-6 py-4 text-gray-500">{txn.date}</td>
-                    <td className="px-6 py-4 text-gray-500">{txn.amount}</td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          txn.status === "Completed"
-                            ? "bg-green-100 text-green-800"
-                            : txn.status === "Pending"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {txn.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex space-x-2">
-                        <button className="text-green-600 hover:text-green-700">
-                          <Edit className="h-4 w-4" />
-                        </button>
-                        <button className="text-red-600 hover:text-red-700">
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan={6} className="text-center py-6 text-gray-500">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  orders.slice(0, 5).map((order, i) => (
+                    <tr key={i} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 font-medium text-gray-900">
+                        {order.id}
+                      </td>
+                      <td
+                        className="px-6 py-4 text-gray-500 cursor-pointer underline"
+                        onClick={() => setSelectedOrder(order)}
+                      >
+                        {order.client_name}
+                      </td>
+                      <td className="px-6 py-4 text-gray-500">
+                        {formatDate(order.created_at)}
+                      </td>
+                      <td className="px-6 py-4 text-gray-500">
+                        {order.prix_total} DH
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusStyle(
+                            order.statut
+                          )}`}
+                        >
+                          {order.statut}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
