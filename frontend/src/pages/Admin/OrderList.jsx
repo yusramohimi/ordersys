@@ -1,20 +1,25 @@
 import React, { useEffect, useState } from "react";
 import SideBar from "./SideBar";
-import FactureModal from "../FactureModal"; // <-- Assure-toi que le nom est bien le bon
-
+import FactureModal from "../FactureModal";
 const OrderList = () => {
-  const [transactions, setTransactions] = useState([]);
-
+  const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState([]);
+  const [estimatedTime, setEstimatedTime] = useState([]);
+  const [selectedCommande, setSelectedCommande] = useState(null); 
   useEffect(() => {
     fetch("http://localhost:8000/api/admin/orders")
       .then((res) => res.json())
       .then((data) => {
-        
-        setTransactions(data);
+        const pendingOrders = data.filter(
+          (order) => order.statut === "en_attente"
+        );
+        setOrders(pendingOrders);
       })
       .catch((err) => console.error(err));
   }, []);
 
+  // Fonction pour supprimer une commande
   const handleCancel = (id) => {
     fetch(`http://localhost:8000/api/admin/orders/${id}`, {
       method: "DELETE",
@@ -22,7 +27,7 @@ const OrderList = () => {
       .then((res) => {
         if (res.ok) {
           // Met à jour la liste après suppression
-          setTransactions((prev) => prev.filter((txn) => txn.id !== id));
+          setOrders((prev) => prev.filter((order) => order.id !== id));
         } else {
           alert("Erreur lors de la suppression");
         }
@@ -102,7 +107,14 @@ const OrderList = () => {
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                {["Order ID", "Client", "Date", "Amount", "Status", "Action"].map((header, i) => (
+                {[
+                  "Order ID",
+                  "Client",
+                  "Date",
+                  "Amount",
+                  "Status",
+                  "Action",
+                ].map((header, i) => (
                   <th
                     key={i}
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -146,10 +158,9 @@ const OrderList = () => {
                     >
                       Cancel
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedCommande(txn.id)}
-                      className="bg-green-600 text-white hover:bg-green-700 text-xs px-3 py-1 rounded-md transition-all"
+                     <button
+                      className="bg-green-600 text-white hover:bg-green-700 text-xs px-3 py-1 rounded-md"
+                      onClick={() => setSelectedCommande(order.id)}
                     >
                       Invoice
                     </button>
@@ -167,6 +178,77 @@ const OrderList = () => {
           </table>
         </div>
       </div>
+
+      {selectedOrder && (
+        <div className="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-lg border shadow-lg">
+            <h2 className="text-xl font-semibold mb-4 text-green-700">
+              Order Details
+            </h2>
+            <p>
+              <strong>Client:</strong> {selectedOrder.client_name}
+            </p>
+            <p>
+              <strong>Adresse:</strong> {selectedOrder.adresse}
+            </p>
+            <p>
+              <strong>Montant:</strong> {selectedOrder.prix_total}
+            </p>
+            <p>
+              <strong>Date:</strong>{" "}
+              {new Date(selectedOrder.created_at).toLocaleDateString()}
+            </p>
+
+            <div className="my-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Statut de la commande
+              </label>
+              <select
+                className="w-full mt-1 border-gray-300 rounded-md"
+                value={selectedStatus || ""}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+              >
+               <option value="en_attente">En Attente</option>
+                <option value="confirmee">Confirmée</option>
+              </select>
+            </div>
+
+            <div className="my-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Heure estimée de livraison
+              </label>
+              <input
+                type="datetime-local"
+                className="w-full mt-1 border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+                value={estimatedTime || ""}
+                disabled
+              />
+            </div>
+
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                className="bg-gray-200 px-4 py-2 rounded"
+                onClick={() => setSelectedOrder(null)}
+              >
+                Fermer
+              </button>
+              <button
+                className="bg-green-600 text-white px-4 py-2 rounded"
+                onClick={handleUpdateOrder}
+              >
+                Modifier
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal de facture */}
+      {selectedCommande && (
+        <FactureModal
+          commandeId={selectedCommande}
+          onClose={() => setSelectedCommande(null)}
+        />
+      )}
     </div>
   );
 };
