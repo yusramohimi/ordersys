@@ -1,6 +1,7 @@
+import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Search, Globe, Bell, ChevronDown, Edit, Trash2 } from "lucide-react";
+import { Search, Globe, Bell, ChevronDown, } from "lucide-react";
 import Apaexlinecolumn from "../../components/charts/Apexlinecolumn";
 import RadialChart from "../../components/charts/RadialChart";
 import SideBar from "./SideBar";
@@ -9,16 +10,29 @@ const Dashboard = () => {
   const [clients, setClients] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [deliveryMen, setDeliveryMen] = useState([]);
+  const navigate = useNavigate();
   useEffect(() => {
     fetch("http://localhost:8000/api/admin/clientslist/latest")
       .then((res) => res.json())
       .then((data) => setClients(data))
       .catch((err) => console.error("Erreur fetch clients:", err));
   }, []);
-
-  const [deliveryMen, setDeliveryMen] = useState([]);
-  const navigate = useNavigate();
+  useEffect(() => {
+    axios
+      .get("http://localhost:8000/api/admin/orders")
+      .then((res) => {
+        const sortedOrders = res.data.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+        setOrders(sortedOrders);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Erreur lors de la récupération des commandes :", err);
+        setLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     fetch("http://localhost:8000/api/admin/livreurlist/latest")
@@ -46,6 +60,32 @@ const Dashboard = () => {
       navigate("/login"); // redirection après logout
     } catch (error) {
       console.error("Erreur lors du logout", error);
+    }
+  };
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+  };
+    const getStatusStyle = (statut) => {
+    switch (statut.toLowerCase()) {
+      case "en_attente":
+        return "bg-yellow-100 text-yellow-800";
+      case "confirmee":
+        return "bg-blue-100 text-blue-800";
+      case "en_cours":
+        return "bg-purple-100 text-purple-800";
+      case "en_livraison":
+        return "bg-indigo-100 text-indigo-800";
+      case "livree":
+      case "livrée":
+        return "bg-green-100 text-green-800";
+      case "retour":
+        return "bg-orange-100 text-orange-800";
+      case "annulee":
+      case "annulée":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -233,7 +273,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Orders */}
         {/* Orders */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="p-5 border-b flex justify-between items-center">

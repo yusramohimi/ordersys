@@ -202,6 +202,7 @@ const OrderList = () => {
                 value={selectedStatus || ""}
                 onChange={(e) => setSelectedStatus(e.target.value)}
               >
+                <option value="en_attente">En Attente</option>
                 <option value="confirmee">Confirmée</option>
               </select>
             </div>
