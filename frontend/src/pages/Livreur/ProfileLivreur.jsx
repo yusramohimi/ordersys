@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import SideBar from "./SideBar";
+import { useNavigate } from "react-router-dom";
+import SideBarLiv from "./SideBarLiv";
 
-const ProfileAdmin = () => {
-  const [admin, setAdmin] = useState({ nom: "", email: "", id: 1 });
+const ProfileLivreur = () => {
+  const [livreur, setLivreur] = useState({
+    nom: "",
+    email: "",
+    telephone: "",
+    id: null,
+  });
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [message, setMessage] = useState("");
@@ -12,12 +17,12 @@ const ProfileAdmin = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/api/admin/profile", {
+      .get("http://localhost:8000/api/livreur/profile", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
-      .then((res) => setAdmin(res.data))
+      .then((res) => setLivreur(res.data))
       .catch((err) => console.error(err));
   }, []);
 
@@ -25,13 +30,14 @@ const ProfileAdmin = () => {
     e.preventDefault();
     try {
       const data = {
-        nom: admin.nom,
-        email: admin.email,
+        nom: livreur.nom,
+        email: livreur.email,
+        telephone: livreur.telephone,
         ...(password && { password, password_confirmation: passwordConfirm }),
       };
 
       const res = await axios.put(
-        "http://localhost:8000/api/admin/profile",
+        "http://localhost:8000/api/livreur/profile",
         data,
         {
           headers: {
@@ -40,9 +46,7 @@ const ProfileAdmin = () => {
         }
       );
       setMessage(res.data.message || "Profil mis à jour avec succès.");
-      setTimeout(() => {
-        navigate("/admin/dashboard"); // modifie selon ton route exacte
-      }, 2000);
+      setTimeout(() => navigate("/livreur/dashboard"), 1500);
     } catch (err) {
       console.error(err);
       setMessage("Erreur lors de la mise à jour.");
@@ -51,12 +55,9 @@ const ProfileAdmin = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* SideBar */}
-      <SideBar />
-
-      {/* Main content */}
-      <div className="flex-1 ml-64 overflow-auto p-6">
-        <h1 className="text-3xl font-semibold mb-6">Profile</h1>
+      <SideBarLiv />
+      <div className="max-w-4xl mx-auto p-6">
+        <h1 className="text-3xl font-semibold mb-6">Profil Livreur</h1>
 
         {message && (
           <div className="bg-green-100 text-green-700 p-3 rounded mb-4">
@@ -65,11 +66,14 @@ const ProfileAdmin = () => {
         )}
 
         <div className="bg-white shadow rounded-lg p-6 mb-6 flex items-center space-x-6">
-          <img src="" alt="admin" className="w-24 h-24 rounded-full border" />
+          <img src="" alt="livreur" className="w-24 h-24 rounded-full border" />
           <div>
-            <p className="text-xl font-semibold">{admin.nom}</p>
-            <p className="text-gray-600">{admin.email}</p>
-            <p className="text-gray-400 text-sm">ID no: #{admin.id}</p>
+            <p className="text-xl font-semibold">{livreur.nom}</p>
+            <p className="text-gray-600">{livreur.email}</p>
+            <p className="text-gray-400 text-sm">
+              Téléphone : {livreur.telephone}
+            </p>
+            <p className="text-gray-400 text-sm">ID no: #{livreur.id}</p>
           </div>
         </div>
 
@@ -78,14 +82,14 @@ const ProfileAdmin = () => {
           className="bg-white shadow rounded-lg p-6 space-y-4"
         >
           <h2 className="text-xl font-semibold mb-2">
-            Changer les informations
+            Modifier les informations
           </h2>
           <div>
             <label className="block text-sm font-medium mb-1">Nom</label>
             <input
               type="text"
-              value={admin.nom}
-              onChange={(e) => setAdmin({ ...admin, nom: e.target.value })}
+              value={livreur.nom}
+              onChange={(e) => setLivreur({ ...livreur, nom: e.target.value })}
               className="w-full border border-gray-300 p-2 rounded"
             />
           </div>
@@ -93,8 +97,21 @@ const ProfileAdmin = () => {
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
               type="email"
-              value={admin.email}
-              onChange={(e) => setAdmin({ ...admin, email: e.target.value })}
+              value={livreur.email}
+              onChange={(e) =>
+                setLivreur({ ...livreur, email: e.target.value })
+              }
+              className="w-full border border-gray-300 p-2 rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Téléphone</label>
+            <input
+              type="text"
+              value={livreur.telephone}
+              onChange={(e) =>
+                setLivreur({ ...livreur, telephone: e.target.value })
+              }
               className="w-full border border-gray-300 p-2 rounded"
             />
           </div>
@@ -124,7 +141,7 @@ const ProfileAdmin = () => {
           <div className="flex justify-end space-x-4">
             <button
               type="button"
-              onClick={() => navigate("/admin/dashboard")}
+              onClick={() => navigate("/livreur/dashboard")}
               className="bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded"
             >
               Annuler
@@ -142,4 +159,4 @@ const ProfileAdmin = () => {
   );
 };
 
-export default ProfileAdmin;
+export default ProfileLivreur;

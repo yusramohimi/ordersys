@@ -13,6 +13,7 @@ import OrderListLiv from "./pages/Livreur/OrderListLiv";
 import DashboardLiv from "./pages/Livreur/DashboardLiv";
 import StockMovement from "./pages/Admin/StockMovement";
 import ProfileAdmin from "./pages/Admin/ProfileAdmin";
+import ProfileLivreur from "./pages/Livreur/ProfileLivreur";
 
 function App() {
   const { user } = useSelector((state) => state.auth);
@@ -35,6 +36,7 @@ function App() {
             <Route path="/livreur/dashboard" element={<DashboardLiv />} />
             <Route path="/admin/stock" element={<StockMovement/>}/>
             <Route path="/admin/profile" element={<ProfileAdmin/>}/>
+            <Route path="/livreur/profile" element={<ProfileLivreur/>}/>
           </Routes>
         </div>
       </div>
