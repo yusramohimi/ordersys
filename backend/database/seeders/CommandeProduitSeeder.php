@@ -16,7 +16,7 @@ class CommandeProduitSeeder extends Seeder
             $produit = $produits->random();
 
             DB::table('commande_produit')->insert([
-                'commande_id'   => rand(18, 29),
+                'commande_id'   => rand(2, 12),
                 'produit_id'    => $produit->id,
                 'quantite'      => rand(1, 5),
                 'prix_unitaire' => $produit->prix_unitaire,

@@ -13,10 +13,15 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\API\StockMovementController;
 use App\Http\Controllers\API\ProduitController;
 use App\Http\Controllers\API\FactureController;
- 
-
+use App\Http\Controllers\API\AdminProfileController;
 
 //Routes de l'Admin
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/admin/profile', [AdminProfileController::class, 'show']);
+    Route::put('/admin/profile', [AdminProfileController::class, 'update']);
+});
+
+
 Route::get('/admin/produits', [ProduitController::class, 'index']);
 Route::get('/admin/produits/{id}', [ProduitController::class, 'show']); 
 
