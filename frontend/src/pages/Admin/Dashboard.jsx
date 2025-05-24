@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Search, Globe, Bell, ChevronDown, } from "lucide-react";
 import Apaexlinecolumn from "../../components/charts/Apexlinecolumn";
 import RadialChart from "../../components/charts/RadialChart";
-import SideBar from "./Sidebar";
+import SideBar from "./SideBar";
 const Dashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [clients, setClients] = useState([]);

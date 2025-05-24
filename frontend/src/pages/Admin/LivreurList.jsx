@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import SideBar from "./Sidebar";
+import SideBar from "./SideBar";
 
 function LivreurList() {
   const [livreurs, setLivreurs] = useState([]);
