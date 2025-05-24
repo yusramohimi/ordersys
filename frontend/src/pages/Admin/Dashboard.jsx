@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Search, Globe, Bell, ChevronDown, } from "lucide-react";
 import Apaexlinecolumn from "../../components/charts/Apexlinecolumn";
 import RadialChart from "../../components/charts/RadialChart";
-import SideBar from "./SideBar";
+import SideBar from "./Sidebar";
 const Dashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [clients, setClients] = useState([]);
@@ -130,7 +130,7 @@ const Dashboard = () => {
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-lg shadow-md z-50">
                   <Link
-                    to="/profile/admin"
+                    to="/admin/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     Profile
