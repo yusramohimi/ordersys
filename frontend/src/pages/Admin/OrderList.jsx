@@ -84,12 +84,12 @@ const OrderList = () => {
     switch (status) {
       case "en_attente":
         return "bg-yellow-100 text-yellow-800";
-      case "confirmee":
+      case "confirmée":
         return "bg-blue-100 text-blue-800";
       case "en_cours":
         return "bg-purple-100 text-purple-800";
       case "en_livraison":
-        return "bg-indigo-100 text-indigo-800";
+        return "bg-indigo-200 text-indigo-800";
       case "livree":
       case "livrée":
         return "bg-green-100 text-green-800";
@@ -122,7 +122,7 @@ const OrderList = () => {
             >
               <option value="all">Tous les statuts</option>
               <option value="en_attente">En attente</option>
-              <option value="confirmee">Confirmée</option>
+              <option value="confirmée">Confirmée</option>
               <option value="en_cours">En cours</option>
               <option value="en_livraison">En livraison</option>
               <option value="livrée">Livrée</option>
@@ -242,7 +242,7 @@ const OrderList = () => {
                 onChange={(e) => setSelectedStatus(e.target.value)}
               >
                 <option value="en_attente">En attente</option>
-                <option value="confirmee">Confirmée</option>
+                <option value="confirmée">Confirmée</option>
                 <option value="en_cours">En cours</option>
                 <option value="en_livraison">En livraison</option>
                 <option value="livrée">Livrée</option>
