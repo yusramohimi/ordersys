@@ -69,6 +69,12 @@ Route::put('/livreur/orders/{id}/update', function ($id, Request $request) {
 });
 Route::put('/livreur/orders/{id}/update-status', [CommandeController::class, 'updateStatus']);
 
+Route::middleware('auth:livreur')->group(function () {
+    Route::get('/livreur/profile', [LivreurController::class, 'profile']);
+    Route::put('/livreur/profile', [LivreurController::class, 'updateProfile']);
+});
+
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();

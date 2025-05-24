@@ -12,7 +12,7 @@ use App\Traits\LogsAdminActions;
 class LivreurController extends Controller
 {
     use LogsAdminActions;
-    
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -32,7 +32,7 @@ class LivreurController extends Controller
         $livreur->region_id = $validated['region_id']; // ✅ récupéré dynamiquement
 
         $livreur->save();
-        
+
         $this->logAdminAction(
             'create',
             'Livreur',
@@ -49,9 +49,33 @@ class LivreurController extends Controller
     public function latest()
     {
         return Livreur::with('region')
-        ->orderBy('id', 'desc')
-        ->limit(5)
-        ->get();
+            ->orderBy('id', 'desc')
+            ->limit(5)
+            ->get();
     }
-    
+    public function profile(Request $request)
+    {
+        return response()->json($request->user());
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $livreur = $request->user();
+
+        $request->validate([
+            'nom' => 'required|string|max:255',
+            'email' => 'required|email|unique:livreurs,email,' . $livreur->id,
+            'telephone' => 'required|string',
+            'password' => 'nullable|confirmed|min:6'
+        ]);
+
+        $livreur->update([
+            'nom' => $request->nom,
+            'email' => $request->email,
+            'telephone' => $request->telephone,
+            'password' => $request->password ? bcrypt($request->password) : $livreur->password
+        ]);
+
+        return response()->json(['message' => 'Profil mis à jour avec succès.']);
+    }
 }
