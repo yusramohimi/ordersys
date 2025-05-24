@@ -280,7 +280,7 @@ const Dashboard = () => {
               Recent Orders
             </h2>
             <Link
-              to="/livreur/orders"
+              to="/admin/orders"
               className="text-sm text-green-600 hover:text-green-700 font-medium"
             >
               View All

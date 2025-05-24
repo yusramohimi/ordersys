@@ -12,7 +12,7 @@ use App\Http\Controllers\API\AdminLogExportController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\API\StockMovementController;
 use App\Http\Controllers\API\ProduitController;
-
+use App\Http\Controllers\API\FactureController;
  
 
 
@@ -42,11 +42,15 @@ Route::put('/admin/orders/{id}/update', function ($id, Request $request) {
 });
 
 
-
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/admin/stock', [StockMovementController::class, 'index']);
     Route::post('/admin/stock', [StockMovementController::class, 'store']);
 });
+
+
+
+Route::get('/facture/{id}', [FactureController::class, 'show']);
+
 
 // Routes Livreurs
 Route::get('/livreur/orders', [CommandeController::class, 'index']);

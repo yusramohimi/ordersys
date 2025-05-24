@@ -1,32 +1,42 @@
 import React, { useEffect, useState } from "react";
 import SideBar from "./SideBar";
+import FactureModal from "../FactureModal";
 
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState([]);
-  const [estimatedTime, setEstimatedTime] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [estimatedTime, setEstimatedTime] = useState("");
+  const [selectedCommande, setSelectedCommande] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     fetch("http://localhost:8000/api/admin/orders")
       .then((res) => res.json())
       .then((data) => {
-        const pendingOrders = data.filter(
-          (order) => order.statut === "en_attente"
-        );
-        setOrders(pendingOrders);
+        setOrders(data);
+        setFilteredOrders(data);
       })
       .catch((err) => console.error(err));
   }, []);
 
-  // Fonction pour supprimer une commande
+  useEffect(() => {
+    if (statusFilter === "all") {
+      setFilteredOrders(orders);
+    } else {
+      setFilteredOrders(
+        orders.filter((order) => order.statut === statusFilter)
+      );
+    }
+  }, [statusFilter, orders]);
+
   const handleCancel = (id) => {
     fetch(`http://localhost:8000/api/admin/orders/${id}`, {
       method: "DELETE",
     })
       .then((res) => {
         if (res.ok) {
-          // Met à jour la liste après suppression
           setOrders((prev) => prev.filter((order) => order.id !== id));
         } else {
           alert("Erreur lors de la suppression");
@@ -34,6 +44,7 @@ const OrderList = () => {
       })
       .catch(() => alert("Erreur réseau"));
   };
+
   const handleUpdateOrder = () => {
     fetch(`http://localhost:8000/api/admin/orders/${selectedOrder.id}/update`, {
       method: "PUT",
@@ -78,9 +89,9 @@ const OrderList = () => {
       case "en_cours":
         return "bg-purple-100 text-purple-800";
       case "en_livraison":
-        return "bg-indigo-100 text-indigo-800"; // ✅ Ajouté
+        return "bg-indigo-100 text-indigo-800";
       case "livree":
-      case "livrée": // au cas où tu reçois l’un ou l’autre
+      case "livrée":
         return "bg-green-100 text-green-800";
       case "retour":
         return "bg-orange-100 text-orange-800";
@@ -99,33 +110,54 @@ const OrderList = () => {
       </div>
 
       <div className="flex-1 p-6 overflow-auto">
-        <h1 className="text-2xl font-semibold text-gray-800 mb-6">
-          Orders List
-        </h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-semibold text-gray-800 mb-4">
+            Orders List
+          </h1>
+          <div className="mt-2">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="all">Tous les statuts</option>
+              <option value="en_attente">En attente</option>
+              <option value="confirmee">Confirmée</option>
+              <option value="en_cours">En cours</option>
+              <option value="en_livraison">En livraison</option>
+              <option value="livrée">Livrée</option>
+              <option value="retour">Retour</option>
+              <option value="annulee">Annulée</option>
+            </select>
+          </div>
+        </div>
 
         <div className="bg-white shadow rounded-lg overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                {[
-                  "Order ID",
-                  "Client",
-                  "Date",
-                  "Amount",
-                  "Status",
-                  "Action",
-                ].map((header, i) => (
-                  <th
-                    key={i}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    {header}
-                  </th>
-                ))}
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Order ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Client
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Amount
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50">
                   <td
                     className="px-6 py-4 font-medium text-green-600 cursor-pointer"
@@ -151,20 +183,26 @@ const OrderList = () => {
                       {order.statut}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 space-x-2">
                     <button
-                      className="border border-red-500 text-red-600 hover:bg-red-50 text-xs px-3 py-1 rounded-md transition-all"
+                      className="border border-red-500 text-red-600 hover:bg-red-50 text-xs px-3 py-1 rounded-md"
                       onClick={() => handleCancel(order.id)}
                     >
                       Cancel
                     </button>
+                    <button
+                      className="bg-green-600 text-white hover:bg-green-700 text-xs px-3 py-1 rounded-md"
+                      onClick={() => setSelectedCommande(order.id)}
+                    >
+                      Invoice
+                    </button>
                   </td>
                 </tr>
               ))}
-              {orders.length === 0 && (
+              {filteredOrders.length === 0 && (
                 <tr>
                   <td colSpan={6} className="text-center py-6 text-gray-500">
-                    No Available Orders.
+                    Aucune commande trouvée.
                   </td>
                 </tr>
               )}
@@ -173,6 +211,7 @@ const OrderList = () => {
         </div>
       </div>
 
+      {/* Modal de détails commande */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-lg border shadow-lg">
@@ -202,8 +241,13 @@ const OrderList = () => {
                 value={selectedStatus || ""}
                 onChange={(e) => setSelectedStatus(e.target.value)}
               >
-                <option value="en_attente">En Attente</option>
+                <option value="en_attente">En attente</option>
                 <option value="confirmee">Confirmée</option>
+                <option value="en_cours">En cours</option>
+                <option value="en_livraison">En livraison</option>
+                <option value="livrée">Livrée</option>
+                <option value="retour">Retour</option>
+                <option value="annulee">Annulée</option>
               </select>
             </div>
 
@@ -213,9 +257,9 @@ const OrderList = () => {
               </label>
               <input
                 type="datetime-local"
-                className="w-full mt-1 border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+                className="w-full mt-1 border-gray-300 rounded-md"
                 value={estimatedTime || ""}
-                disabled
+                onChange={(e) => setEstimatedTime(e.target.value)}
               />
             </div>
 
@@ -235,6 +279,14 @@ const OrderList = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal de facture */}
+      {selectedCommande && (
+        <FactureModal
+          commandeId={selectedCommande}
+          onClose={() => setSelectedCommande(null)}
+        />
       )}
     </div>
   );
