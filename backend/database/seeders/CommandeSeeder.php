@@ -22,7 +22,7 @@ class CommandeSeeder extends Seeder
                 'livreur_id' => $livreurs[array_rand($livreurs)],
                 'code_promo_id' => $codesPromo[array_rand($codesPromo)],
                 'prix_total' => rand(100, 10000),
-                'statut' => collect(['en_attente','confirmee','en_cours','livree','retour','annulee'])->random(),
+                'statut' => collect(['en_attente', 'confirmée', 'en_livraison', 'livrée', 'retour', 'annulée'])->random(),
                 'heure_estimee_livraison' => now()->addDays(rand(1, 5)),
                 'created_at' => Carbon::now()->subDays(rand(1, 5)),
                 'updated_at' => now(),

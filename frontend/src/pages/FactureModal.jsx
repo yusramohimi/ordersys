@@ -1,10 +1,10 @@
-// InvoiceModal.jsx
+// FactureModal.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
 import Facture from './Facture';
 
-const InvoiceModal = ({ commandeId, onClose }) => {
+const FactureModal = ({ commandeId, onClose }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -54,4 +54,4 @@ const InvoiceModal = ({ commandeId, onClose }) => {
   );
 };
 
-export default InvoiceModal;
+export default FactureModal;
