@@ -14,7 +14,7 @@ class NotificationController extends Controller
         $user = $request->user();
 
         return response()->json([
-            'notifications' => $user->notifications()->latest()->get()
+            'notifications' => $user->notifications()->latest()->take(10)->get()
         ]);
     }
 
