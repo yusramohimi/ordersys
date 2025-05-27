@@ -14,6 +14,17 @@ use App\Http\Controllers\API\StockMovementController;
 use App\Http\Controllers\API\ProduitController;
 use App\Http\Controllers\API\FactureController;
 use App\Http\Controllers\API\AdminProfileController;
+use App\Http\Controllers\API\NotificationController;
+
+
+// notifications 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+});
+
 
 //Routes de l'Admin
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -58,7 +69,13 @@ Route::get('/facture/{id}', [FactureController::class, 'show']);
 
 
 // Routes Livreurs
-Route::get('/livreur/orders', [CommandeController::class, 'index']);
+// Route::get('/livreur/orders', [CommandeController::class, 'index']);
+// routes/api.php
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/livreur/orders', [CommandeController::class, 'ordersForLivreur']);
+});
+
 Route::middleware('auth:sanctum')->get('/livreur/commandes', [CommandeController::class, 'index']);
 Route::put('/livreur/orders/{id}/update', function ($id, Request $request) {
     $commande = \App\Models\Commande::findOrFail($id);

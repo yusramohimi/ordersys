@@ -6,13 +6,28 @@ const OrderListLiv = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [estimatedTime, setEstimatedTime] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    fetch("http://localhost:8000/api/livreur/orders")
-      .then((res) => res.json())
-      .then((data) => setOrders(data))
-      .catch((err) => console.error("Erreur de chargement :", err));
-  }, []);
+useEffect(() => {
+  const token = localStorage.getItem('token'); // Assure-toi que le token a bien été stocké après login
+
+  fetch("http://localhost:8000/api/livreur/orders", {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Accept": "application/json"
+    }
+  })
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error(`Erreur ${res.status}: ${res.statusText}`);
+      }
+      return res.json();
+    })
+    .then((data) => setOrders(data))
+    .catch((err) => console.error("Erreur de chargement :", err));
+}, []);
+
 
   const handleCancel = (id) => {
     fetch(`http://localhost:8000/api/livreur/orders/${id}`, {

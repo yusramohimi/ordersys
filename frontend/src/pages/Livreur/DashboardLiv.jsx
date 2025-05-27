@@ -11,22 +11,32 @@ const DashboardLiv = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/livreur/orders")
-      .then((res) => {
-        // On trie les commandes par date décroissante (si applicable)
-        const sortedOrders = res.data.sort(
-          (a, b) => new Date(b.created_at) - new Date(a.created_at)
-        );
-        setOrders(sortedOrders);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Erreur lors de la récupération des commandes :", err);
-        setLoading(false);
+useEffect(() => {
+  const fetchOrders = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.get("http://localhost:8000/api/livreur/orders", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true, // utile si tu utilises Laravel Sanctum
       });
-  }, []);
+
+      const sortedOrders = res.data.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      );
+      setOrders(sortedOrders);
+    } catch (err) {
+      console.error("Erreur lors de la récupération des commandes :", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchOrders();
+}, []);
+
 
   const handleLogout = async () => {
     try {

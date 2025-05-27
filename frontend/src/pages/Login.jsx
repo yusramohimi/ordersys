@@ -24,25 +24,30 @@ export default function Login() {
     try {
       const res = await fetch("http://127.0.0.1:8000/api/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        credentials: "include", // ❗ Si tu utilises Sanctum. Sinon retire cette ligne.
         body: JSON.stringify(data),
       });
 
       const result = await res.json();
 
-      if (res.ok) {
+      if (!res.ok) {
+        setLoginError(result.message || "Identifiants incorrects.");
+        return;
+      }
+
+      if (result.token && result.user_type && result.user) {
         localStorage.setItem("token", result.token);
         localStorage.setItem("role", result.user_type);
         localStorage.setItem("user", JSON.stringify(result.user));
         setLoginError("");
         window.location.href = `/${result.user_type}/dashboard`;
       } else {
-        setLoginError(result.message || "Erreur d'identifiants");
+        setLoginError("Données de réponse invalides.");
       }
     } catch (error) {
-      console.error("Login error:", error);
-      setLoginError("Erreur de connexion au serveur.");
+      console.error("Erreur de connexion :", error);
+      setLoginError("Impossible de se connecter au serveur.");
     }
   };
 
@@ -63,17 +68,9 @@ export default function Login() {
               </p>
             </div>
 
-            {/* Login Form */}
-            <form
-              id="login-form"
-              className="space-y-4"
-              onSubmit={handleSubmit(onSubmit)}
-            >
+            <form id="login-form" className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Adresse email
                 </label>
                 <input
@@ -85,17 +82,12 @@ export default function Login() {
                   } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500`}
                 />
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.email.message}
-                  </p>
+                  <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
                 )}
               </div>
 
               <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Mot de passe
                 </label>
                 <input
@@ -107,16 +99,13 @@ export default function Login() {
                   } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500`}
                 />
                 {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.password.message}
-                  </p>
+                  <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
                 )}
               </div>
-              {/* Bouton centré au-dessus */}
+
               <div className="w-full flex justify-center mb-2">
                 <button
                   type="submit"
-                  form="login-form"
                   className="px-6 py-2 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700"
                 >
                   Se connecter
@@ -124,7 +113,7 @@ export default function Login() {
               </div>
 
               {loginError && (
-                <p className="text-sm text-red-600">{loginError}</p>
+                <p className="text-sm text-red-600 text-center">{loginError}</p>
               )}
             </form>
           </div>
