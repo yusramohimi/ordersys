@@ -1,10 +1,12 @@
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Search, Globe, Bell, ChevronDown, } from "lucide-react";
+import { Search, Globe, Bell, ChevronDown } from "lucide-react";
 import Apaexlinecolumn from "../../components/charts/Apexlinecolumn";
 import RadialChart from "../../components/charts/RadialChart";
 import SideBar from "./SideBar";
+import NotificationDropdown from "../NotificationDropdown";
+
 const Dashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [clients, setClients] = useState([]);
@@ -66,7 +68,7 @@ const Dashboard = () => {
     const date = new Date(dateStr);
     return date.toLocaleDateString() + " " + date.toLocaleTimeString();
   };
-    const getStatusStyle = (statut) => {
+  const getStatusStyle = (statut) => {
     switch (statut.toLowerCase()) {
       case "en_attente":
         return "bg-yellow-100 text-yellow-800";
@@ -111,10 +113,10 @@ const Dashboard = () => {
             <button className="p-2 text-gray-500 hover:text-gray-700">
               <Globe className="h-5 w-5" />
             </button>
-            <button className="p-2 text-gray-500 hover:text-gray-700 relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-            </button>
+            <div className="relative">
+              <NotificationDropdown />
+            </div>
+
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}

@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Dropdown, DropdownToggle, DropdownMenu, Row, Col } from "reactstrap";
-import SimpleBar from "simplebar-react";
 import axios from "axios";
+import { Bell, Info } from "lucide-react";
 
 const NotificationDropdown = () => {
-  const [menu, setMenu] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
 
   const fetchNotifications = async () => {
@@ -23,81 +22,58 @@ const NotificationDropdown = () => {
   };
 
   useEffect(() => {
-    if (menu) fetchNotifications();
-  }, [menu]);
+    if (isOpen) fetchNotifications();
+  }, [isOpen]);
 
   return (
-    <Dropdown
-      isOpen={menu}
-      toggle={() => setMenu(!menu)}
-      className="dropdown d-inline-block"
-      tag="li"
-    >
-      <DropdownToggle
-        className="btn header-item noti-icon"
-        tag="button"
-        id="page-header-notifications-dropdown"
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="p-2 relative hover:text-gray-800 focus:outline-none"
       >
-        <i className="ri-notification-3-line" />
-        {notifications.length > 0 && <span className="noti-dot" />}
-      </DropdownToggle>
+        <Bell className="w-6 h-6 text-gray-600" />
+        {notifications.length > 0 && (
+          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+        )}
+      </button>
 
-      <DropdownMenu className="dropdown-menu-lg dropdown-menu-end p-0">
-        <div className="p-3">
-          <Row className="align-items-center">
-            <Col>
-              <h6 className="m-0">Notifications</h6>
-            </Col>
-            <div className="col-auto">
-              <Link to="/notifications" className="small">
-                Voir tout
-              </Link>
-            </div>
-          </Row>
-        </div>
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg z-50">
+          <div className="p-4 border-b flex justify-between items-center">
+            <h3 className="text-gray-800 font-semibold">Notifications</h3>
+            <Link to="/notifications" className="text-sm text-green-600 hover:underline">
+              Voir tout
+            </Link>
+          </div>
 
-        <SimpleBar style={{ height: "230px" }}>
-          {notifications.length > 0 ? (
-            notifications.map((notif) => (
-              <Link
-                to="#"
-                key={notif.id}
-                className="text-reset notification-item"
-              >
-                <div className="d-flex">
-                  <div className="flex-shrink-0 me-3">
-                    <div className="avatar-xs">
-                      <span className="avatar-title bg-success rounded-circle font-size-16">
-                        <i className="ri-information-line"></i>
-                      </span>
-                    </div>
+          <div className="max-h-64 overflow-y-auto">
+            {notifications.length > 0 ? (
+              notifications.map((notif) => (
+                <div key={notif.id} className="flex items-start gap-3 p-4 border-b last:border-none hover:bg-gray-50">
+                  <div className="mt-1 bg-green-100 p-2 rounded-full">
+                    <Info className="w-4 h-4 text-green-600" />
                   </div>
-                  <div className="flex-grow-1">
-                    <h6 className="mb-1">{notif.data.message}</h6>
-                    <div className="font-size-12 text-muted">
-                      <p className="mb-0">
-                        <i className="mdi mdi-clock-outline"></i>{" "}
-                        {new Date(notif.created_at).toLocaleString()}
-                      </p>
-                    </div>
+                  <div className="text-sm">
+                    <p className="font-medium text-gray-800">{notif.data.message}</p>
+                    <p className="text-gray-500 text-xs mt-1">
+                      {new Date(notif.created_at).toLocaleString()}
+                    </p>
                   </div>
                 </div>
-              </Link>
-            ))
-          ) : (
-            <div className="text-center p-3 text-muted">
-              Aucune notification
-            </div>
-          )}
-        </SimpleBar>
+              ))
+            ) : (
+              <div className="text-center p-4 text-gray-500">Aucune notification</div>
+            )}
+          </div>
 
-        <div className="p-2 border-top d-grid">
-          <Link className="btn btn-sm btn-link font-size-14 text-center" to="/notifications">
-            <i className="mdi mdi-arrow-right-circle me-1"></i> Voir plus
-          </Link>
+          <div className="text-center p-2 border-t">
+            <Link to="/notifications" className="text-sm text-green-600 hover:underline">
+              &uarr; Voir plus
+            </Link>
+          </div>
         </div>
-      </DropdownMenu>
-    </Dropdown>
+      )}
+    </div>
   );
 };
 

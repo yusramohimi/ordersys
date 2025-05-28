@@ -5,6 +5,7 @@ import { Search, Globe, Bell, ChevronDown, Edit, Trash2 } from "lucide-react";
 import Apaexlinecolumn from "../../components/charts/Apexlinecolumn";
 import RadialChart from "../../components/charts/RadialChart";
 import SideBarLiv from "./SideBarLiv";
+import NotificationDropdown from "../NotificationDropdown";
 const DashboardLiv = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [orders, setOrders] = useState([]);
@@ -112,10 +113,9 @@ useEffect(() => {
             <button className="p-2 text-gray-500 hover:text-gray-700">
               <Globe className="h-5 w-5" />
             </button>
-            <button className="p-2 text-gray-500 hover:text-gray-700 relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-            </button>
+            <div className="relative">
+              <NotificationDropdown />
+            </div>
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
