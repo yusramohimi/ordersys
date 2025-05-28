@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import SideBar from "./SideBar";
+import admin1 from "../../assets/admins/1.jpg";
+import admin2 from "../../assets/admins/2.jpg";
+import defaultImg from "../../assets/admins/default.png";
 
 const ProfileAdmin = () => {
   const [admin, setAdmin] = useState({ nom: "", email: "", id: 1 });
@@ -9,7 +12,11 @@ const ProfileAdmin = () => {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-
+const imageMap = {
+  1: admin1,
+  2: admin2,
+  
+};
   useEffect(() => {
     axios
       .get("http://localhost:8000/api/admin/profile", {
@@ -65,7 +72,13 @@ const ProfileAdmin = () => {
         )}
 
         <div className="bg-white shadow rounded-lg p-6 mb-6 flex items-center space-x-6">
-          <img src="" alt="admin" className="w-24 h-24 rounded-full border" />
+          <img
+            src={imageMap[admin.id] || defaultImg}
+            alt="admin"
+            className="w-24 h-24 rounded-full border object-cover"
+          />
+
+
           <div>
             <p className="text-xl font-semibold">{admin.nom}</p>
             <p className="text-gray-600">{admin.email}</p>
