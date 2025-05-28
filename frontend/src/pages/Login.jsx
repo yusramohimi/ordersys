@@ -25,7 +25,7 @@ export default function Login() {
       const res = await fetch("http://127.0.0.1:8000/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        credentials: "include", // ❗ Si tu utilises Sanctum. Sinon retire cette ligne.
+        credentials: "include", 
         body: JSON.stringify(data),
       });
 
