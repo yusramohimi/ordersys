@@ -36,7 +36,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::get('/admin/produits', [ProduitController::class, 'index']);
 Route::get('/admin/produits/{id}', [ProduitController::class, 'show']); 
 
-Route::post('/admin/livreurs', [LivreurController::class, 'store']);
+Route::middleware('auth:admin')->group(function () {
+    Route::post('/admin/livreurs', [LivreurController::class, 'store']);
+});
+
 Route::get('/admin/livreurlist', [LivreurController::class, 'index']);
 Route::get('/admin/livreurlist/latest', [LivreurController::class, 'latest']);
 
@@ -49,6 +52,7 @@ Route::get('/admin/clientslist/latest', [ClientController::class, 'latest']);
 
 Route::get('/admin/orders', [CommandeController::class, 'index']);
 Route::delete('/admin/orders/{id}', [CommandeController::class, 'destroy']);
+
 Route::put('/admin/orders/{id}/update', function ($id, Request $request) {
     $commande = \App\Models\Commande::findOrFail($id);
     $commande->heure_estimee_livraison = $request->heure_estimee_livraison;

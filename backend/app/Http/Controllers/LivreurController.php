@@ -19,7 +19,7 @@ class LivreurController extends Controller
             'nom' => 'required|string|max:255',
             'email' => 'required|email|unique:livreurs,email',
             'telephone' => 'required|string|max:20',
-            'region_id' => 'required|exists:regions,id', // ✅ AJOUTÉ
+            'region_id' => 'required|exists:regions,id', 
             'password' => 'required|string|min:6',
         ]);
 
@@ -29,7 +29,7 @@ class LivreurController extends Controller
         $livreur->email = $validated['email'];
         $livreur->telephone = $validated['telephone'];
         $livreur->password = Hash::make($validated['password']);
-        $livreur->region_id = $validated['region_id']; // ✅ récupéré dynamiquement
+        $livreur->region_id = $validated['region_id']; 
 
         $livreur->save();
 

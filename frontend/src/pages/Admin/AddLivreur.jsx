@@ -64,14 +64,16 @@ const AddLivreur = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8000/api/admin/livreurs", {
+        const response = await fetch("http://localhost:8000/api/admin/livreurs", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`, 
         },
         body: JSON.stringify(payload),
       });
+
 
       const data = await response.json();
 
