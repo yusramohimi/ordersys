@@ -9,14 +9,14 @@ const OrderListLiv = () => {
   const token = localStorage.getItem("token");
 
 useEffect(() => {
-  const token = localStorage.getItem('token'); // Assure-toi que le token a bien été stocké après login
+  const token = localStorage.getItem("token");
 
   fetch("http://localhost:8000/api/livreur/orders", {
     method: "GET",
     headers: {
-      "Authorization": `Bearer ${token}`,
-      "Accept": "application/json"
-    }
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+    },
   })
     .then((res) => {
       if (!res.ok) {
@@ -24,9 +24,13 @@ useEffect(() => {
       }
       return res.json();
     })
-    .then((data) => setOrders(data))
+    .then((data) => {
+      const confirmedOrders = data.filter((order) => order.statut !== "en_attente");
+      setOrders(confirmedOrders);
+    })
     .catch((err) => console.error("Erreur de chargement :", err));
 }, []);
+
 
 
   const handleCancel = (id) => {
@@ -105,24 +109,22 @@ const handleUpdateOrder = () => {
 
   const getStatusStyle = (statut) => {
     switch (statut.toLowerCase()) {
-      case "en_attente":
-        return "bg-yellow-100 text-yellow-800";
-      case "confirmee":
-        return "bg-blue-100 text-blue-800";
-      case "en_cours":
-        return "bg-purple-100 text-purple-800";
-      case "en_livraison":
-        return "bg-indigo-100 text-indigo-800";
-      case "livree":
-      case "livrée":
-        return "bg-green-100 text-green-800";
-      case "retour":
-        return "bg-orange-100 text-orange-800";
-      case "annulee":
-      case "annulée":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+     case "en_attente":
+      return "bg-yellow-100 text-yellow-800";
+    case "confirmée":
+      return "bg-blue-100 text-blue-800";
+    case "en_cours": 
+      return "bg-purple-100 text-purple-800";
+    case "en_livraison":
+      return "bg-indigo-200 text-indigo-800";
+    case "livrée":
+      return "bg-green-100 text-green-800";
+    case "retour":
+      return "bg-orange-100 text-orange-800";
+    case "annulée":
+      return "bg-red-100 text-red-800";
+    default:
+      return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -225,7 +227,6 @@ const handleUpdateOrder = () => {
                 value={selectedStatus || ""}
                 onChange={(e) => setSelectedStatus(e.target.value)}
               >
-                <option value="en_attente">En attente</option>
                 <option value="en_livraison">En Livraison</option>
                 <option value="livrée">Livrée</option>
                 <option value="retour">Retour</option>
