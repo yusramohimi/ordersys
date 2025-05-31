@@ -1,34 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import logoImage from "/src/assets/logo-fr.png";
+import broxodentImage from "/src/assets/broxodent.jpg";
+import FactureModal from "../FactureModal";
+
 
 const ClientDashboard = () => {
+  const [profile, setProfile] = useState(null);
+  const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
+  const [selectedCommande, setSelectedCommande] = useState(null);
+  
+  const token = localStorage.getItem("token");
 
-  const orders = [
-    {
-      id: 1014,
-      product: "Brosse à dents sonore et mécanique",
-      date: "18 avril 2024",
-      amount: "123,00 €",
-      status: "En cours",
-      deliveryEstimate: "23 avril 2024",
-      reference: "Référence r. 1014",
-      image: "/src/assets/broxodent.jpg",
-      invoice: "/factures/facture-1014.pdf"
-    },
-    {
-      id: 1008,
-      product: "Brosse à dents sonore et mécanique",
-      date: "15 avril 2024",
-      amount: "122,00 €",
-      status: "Livré",
-      deliveryEstimate: "20 avril 2024",
-      reference: "Référence r. 1008",
-      image: "/src/assets/broxodent.jpg",
-      invoice: "/factures/facture-1008.pdf"
-    }
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const headers = {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        };
+
+        const [profileRes, commandesRes] = await Promise.all([
+          axios.get("http://localhost:8000/api/client/profile", { headers }),
+          axios.get("http://localhost:8000/api/client/commandes", { headers }),
+        ]);
+
+        setProfile(profileRes.data);
+        setOrders(commandesRes.data.map(cmd => ({
+          id: cmd.id,
+          product: "Brosse à dents sonore et mécanique",
+          date: new Date(cmd.created_at).toLocaleDateString(),
+          amount: cmd.prix_total + " MAD",
+          status: cmd.statut,
+          deliveryEstimate: cmd.heure_estimee_livraison
+            ? new Date(cmd.heure_estimee_livraison).toLocaleDateString()
+            : "Non défini",
+          reference: "Réf. #" + cmd.id,
+          image: broxodentImage,
+          invoice: `/facture/${cmd.id}`,
+        })));
+      } catch (error) {
+        console.error("Erreur chargement dashboard client :", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleOrderClick = (orderId) => {
     setSelectedOrder(orderId);
@@ -39,20 +58,12 @@ const ClientDashboard = () => {
     setShowOrderDetails(false);
   };
 
-  const downloadInvoice = (invoiceUrl, id) => {
-    const link = document.createElement("a");
-    link.href = invoiceUrl;
-    link.download = `facture-${id}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+
 
   const selected = orders.find((o) => o.id === selectedOrder);
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Navbar */}
       <nav className="bg-white shadow-md px-6 py-4 flex justify-between items-center">
         <div>
           <img src={logoImage} alt="Logo Santé Parodonte" className="h-12 w-auto" />
@@ -68,15 +79,15 @@ const ClientDashboard = () => {
       <div className="p-8 max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold text-gray-800 mb-6">Bienvenue,</h2>
 
-        {/* Infos personnelles */}
-        <div className="bg-white shadow-md rounded-xl p-6 mb-6">
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">Mes informations</h3>
-          <p><strong>Nom :</strong> Bouchra El Badaoui</p>
-          <p><strong>Email :</strong> bouchra@example.com</p>
-          <p><strong>Adresse :</strong> Casablanca, Maroc</p>
-        </div>
+        {profile && (
+          <div className="bg-white shadow-md rounded-xl p-6 mb-6">
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">Mes informations</h3>
+            <p><strong>Nom :</strong> {profile.prenom} {profile.nom}</p>
+            <p><strong>Email :</strong> {profile.email}</p>
+            <p><strong>Adresse :</strong> {profile.ville}, {profile.adresse}</p>
+          </div>
+        )}
 
-        {/* Commandes */}
         <section id="commandes" className="bg-white rounded-lg shadow overflow-hidden mb-8">
           <h2 className="text-xl font-semibold p-6 border-b">Mes commandes</h2>
           <div className="overflow-x-auto">
@@ -114,7 +125,6 @@ const ClientDashboard = () => {
           </div>
         </section>
 
-        {/* Factures */}
         <div id="factures" className="bg-white shadow-md rounded-xl p-6">
           <h3 className="text-xl font-semibold text-gray-700 mb-4">Mes factures</h3>
           <ul className="space-y-2">
@@ -124,7 +134,7 @@ const ClientDashboard = () => {
                   <strong>Facture #{order.id}</strong> - {order.amount}
                 </div>
                 <button
-                  onClick={() => downloadInvoice(order.invoice, order.id)}
+                  onClick={() => setSelectedCommande(order.id)}
                   className="text-green-500 hover:underline"
                 >
                   Télécharger
@@ -135,7 +145,6 @@ const ClientDashboard = () => {
         </div>
       </div>
 
-      {/* Popup Détails commande */}
       {showOrderDetails && selected && (
         <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -175,11 +184,12 @@ const ClientDashboard = () => {
               <div className="border-t pt-4">
                 <h4 className="font-medium mb-2">Facture</h4>
                 <button
-                  onClick={() => downloadInvoice(selected.invoice, selected.id)}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-                >
-                  Télécharger la facture
-                </button>
+                    onClick={() => setSelectedCommande(selected.id)}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                  >
+                    Télécharger la facture
+                  </button>
+
               </div>
 
               <button className="mt-6 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
@@ -188,6 +198,14 @@ const ClientDashboard = () => {
             </div>
           </div>
         </div>
+      )}
+
+       {/* Modal de facture */}
+      {selectedCommande && (
+        <FactureModal
+          commandeId={selectedCommande}
+          onClose={() => setSelectedCommande(null)}
+        />
       )}
     </div>
   );

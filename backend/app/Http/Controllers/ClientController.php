@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\Commande;
-
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
@@ -14,7 +13,6 @@ class ClientController extends Controller
         return response()->json(Client::all());
     }
 
-    // Supprimer un client par ID
     public function destroy($id)
     {
         $client = Client::find($id);
@@ -27,37 +25,75 @@ class ClientController extends Controller
 
         return response()->json(['message' => 'Client deleted']);
     }
+
     public function latest()
     {
         $latestClients = Client::orderBy('created_at', 'desc')->take(5)->get();
-
         return response()->json($latestClients);
     }
+
     public function profile(Request $request)
     {
-        return response()->json($request->user());
+        $user = $request->user();
+
+        if (!$user instanceof Client) {
+            return response()->json(['message' => 'Non autorisé'], 403);
+        }
+
+        return response()->json($user);
     }
 
     public function updateProfile(Request $request)
     {
-        $client = $request->user();
-        $client->update($request->only(['nom', 'prenom', 'telephone', 'email', 'adresse']));
-        return response()->json(['message' => 'Profil mis à jour', 'client' => $client]);
+        $user = $request->user();
+
+        if (!$user instanceof Client) {
+            return response()->json(['message' => 'Non autorisé'], 403);
+        }
+
+        $user->update($request->only(['nom', 'prenom', 'telephone', 'email', 'adresse']));
+
+        return response()->json(['message' => 'Profil mis à jour', 'client' => $user]);
     }
 
     public function mesCommandes(Request $request)
     {
-        return response()->json($request->user()->commandes()->with('produits', 'facture')->latest()->get());
+        $user = $request->user();
+
+        if (!$user instanceof Client) {
+            return response()->json(['message' => 'Non autorisé'], 403);
+        }
+
+        return response()->json($user->commandes()->with('produits', 'facture')->latest()->get());
     }
 
-    public function detailsCommande($id)
+    public function detailsCommande(Request $request, $id)
     {
+        $user = $request->user();
+
+        if (!$user instanceof Client) {
+            return response()->json(['message' => 'Non autorisé'], 403);
+        }
+
         $commande = Commande::with('produits', 'facture')->findOrFail($id);
+
+        if ($commande->client_id !== $user->id) {
+            return response()->json(['message' => 'Accès interdit à cette commande'], 403);
+        }
+
         return response()->json($commande);
     }
 
     public function factures(Request $request)
     {
-        return response()->json($request->user()->commandes()->with('facture')->get()->pluck('facture')->filter());
+        $user = $request->user();
+
+        if (!$user instanceof Client) {
+            return response()->json(['message' => 'Non autorisé'], 403);
+        }
+
+        $factures = $user->commandes()->with('facture')->get()->pluck('facture')->filter();
+
+        return response()->json($factures->values());
     }
 }

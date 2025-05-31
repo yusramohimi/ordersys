@@ -56,18 +56,19 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/admin/orders', [CommandeController::class, 'index']);
     Route::delete('/admin/orders/{id}', [CommandeController::class, 'destroy']);
     Route::put('/admin/orders/{id}/update-status', [CommandeController::class, 'updateStatus']);
+
     Route::put('/admin/orders/{id}/update', function ($id, Request $request) {
-    $commande = \App\Models\Commande::findOrFail($id);
-    $commande->heure_estimee_livraison = $request->heure_estimee_livraison;
-    $commande->save();
+        $commande = \App\Models\Commande::findOrFail($id);
+        $commande->heure_estimee_livraison = $request->heure_estimee_livraison;
+        $commande->save();
 
-    return response()->json(['message' => 'Heure de livraison mise à jour.']);
+        return response()->json(['message' => 'Heure de livraison mise à jour.']);
+    });
+
+    Route::post('/admin/livreurs', [LivreurController::class, 'store']);
+    Route::delete('/admin/livreurs/{id}', [LivreurController::class, 'destroy']);
 });
 
-Route::delete('/admin/livreurs/{id}', [LivreurController::class, 'destroy']);
-
-
-});
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -103,22 +104,14 @@ Route::middleware('auth:livreur')->group(function () {
     Route::put('/livreur/profile', [LivreurController::class, 'updateProfile']);
 });
 
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::middleware(function ($request, $next) {
-        if ($request->user() instanceof \App\Models\Client) {
-            return $next($request);
-        }
-        return response()->json(['message' => 'Non autorisé.'], 403);
-    })->group(function () {
-        Route::get('/client/profile', [ClientController::class, 'profile']);
-        Route::put('/client/profile', [ClientController::class, 'updateProfile']);
-
-        Route::get('/client/commandes', [ClientController::class, 'mesCommandes']);
-        Route::get('/client/commandes/{id}', [ClientController::class, 'detailsCommande']);
-
-        Route::get('/client/factures', [ClientController::class, 'factures']);
-    });
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/client/profile', [ClientController::class, 'profile']);
+    Route::put('/client/profile', [ClientController::class, 'updateProfile']);
+    Route::get('/client/commandes', [ClientController::class, 'mesCommandes']);
+    Route::get('/client/commandes/{id}', [ClientController::class, 'detailsCommande']);
+    Route::get('/client/factures', [ClientController::class, 'factures']);
 });
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
