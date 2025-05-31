@@ -16,7 +16,7 @@ class CommandeSeeder extends Seeder
         $livreurs = Livreur::pluck('id')->toArray();
         $codesPromo = CodePromo::pluck('id')->toArray();
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             DB::table('commandes')->insert([
                 'client_id' => $clients[array_rand($clients)],
                 'livreur_id' => $livreurs[array_rand($livreurs)],

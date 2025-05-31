@@ -11,8 +11,20 @@ const OrderList = () => {
   const [selectedCommande, setSelectedCommande] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
 
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
-    fetch("http://localhost:8000/api/admin/orders")
+    if (!token) {
+      alert("Non autorisé : token manquant");
+      return;
+    }
+
+    fetch("http://localhost:8000/api/admin/orders", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         setOrders(data);
@@ -32,8 +44,14 @@ const OrderList = () => {
   }, [statusFilter, orders]);
 
   const handleCancel = (id) => {
+    if (!token) return alert("Non autorisé");
+
     fetch(`http://localhost:8000/api/admin/orders/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
     })
       .then((res) => {
         if (res.ok) {
@@ -46,33 +64,40 @@ const OrderList = () => {
   };
 
   const handleUpdateOrder = () => {
-    fetch(`http://localhost:8000/api/admin/orders/${selectedOrder.id}/update`, {
+  if (!token) return alert("Non autorisé");
+
+  fetch(
+    `http://localhost:8000/api/admin/orders/${selectedOrder.id}/update-status`,
+    {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({
-        heure_estimee_livraison: estimatedTime,
         statut: selectedStatus,
       }),
-    })
-      .then((res) => res.json())
-      .then(() => {
+    }
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      if (data?.statut) {
         setOrders((prev) =>
           prev.map((order) =>
             order.id === selectedOrder.id
-              ? {
-                  ...order,
-                  heure_estimee_livraison: estimatedTime,
-                  statut: selectedStatus,
-                }
+              ? { ...order, statut: data.statut }
               : order
           )
         );
-        setSelectedOrder(null);
-        setEstimatedTime("");
-        setSelectedStatus("");
-      })
-      .catch((err) => console.error("Erreur de mise à jour :", err));
-  };
+      }
+
+      setSelectedOrder(null);
+      setSelectedStatus("");
+    })
+    .catch((err) => console.error("Erreur de mise à jour :", err));
+};
+
 
   const openOrderDetails = (order) => {
     setSelectedOrder(order);
@@ -80,28 +105,27 @@ const OrderList = () => {
     setSelectedStatus(order.statut || "en_attente");
   };
 
-  const getStatusStyle = (status) => {
-    switch (status) {
-      case "en_attente":
-        return "bg-yellow-100 text-yellow-800";
-      case "confirmée":
-        return "bg-blue-100 text-blue-800";
-      case "en_cours":
-        return "bg-purple-100 text-purple-800";
-      case "en_livraison":
-        return "bg-indigo-200 text-indigo-800";
-      case "livree":
-      case "livrée":
-        return "bg-green-100 text-green-800";
-      case "retour":
-        return "bg-orange-100 text-orange-800";
-      case "annulee":
-      case "annulée":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+const getStatusStyle = (status) => {
+  switch (status) {
+    case "en_attente":
+      return "bg-yellow-100 text-yellow-800";
+    case "confirmée":
+      return "bg-blue-100 text-blue-800";
+    case "en_cours": 
+      return "bg-purple-100 text-purple-800";
+    case "en_livraison":
+      return "bg-indigo-200 text-indigo-800";
+    case "livrée":
+      return "bg-green-100 text-green-800";
+    case "retour":
+      return "bg-orange-100 text-orange-800";
+    case "annulée":
+      return "bg-red-100 text-red-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -123,11 +147,10 @@ const OrderList = () => {
               <option value="all">Tous les statuts</option>
               <option value="en_attente">En attente</option>
               <option value="confirmée">Confirmée</option>
-              <option value="en_cours">En cours</option>
               <option value="en_livraison">En livraison</option>
               <option value="livrée">Livrée</option>
               <option value="retour">Retour</option>
-              <option value="annulee">Annulée</option>
+              <option value="annulée">Annulée</option>
             </select>
           </div>
         </div>
@@ -259,8 +282,8 @@ const OrderList = () => {
                 type="datetime-local"
                 className="w-full mt-1 border-gray-300 rounded-md"
                 value={estimatedTime || ""}
-                onChange={(e) => setEstimatedTime(e.target.value)}
-              />
+                readOnly
+/>
             </div>
 
             <div className="mt-4 flex justify-end space-x-2">

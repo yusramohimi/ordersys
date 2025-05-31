@@ -18,9 +18,11 @@ use App\Mail\ClientCredentialsMail;
 use App\Notifications\NouvelleCommandeNotification;
 use App\Notifications\CommandeAffecteeLivreurNotification;
 use App\Notifications\CommandeClientNotification;
+use App\Traits\LogsAdminActions; 
 
 class CommandeController extends Controller
 {
+    use LogsAdminActions;
     public function commander(Request $request)
     {
         DB::beginTransaction();
@@ -128,7 +130,7 @@ class CommandeController extends Controller
     public function updateStatus($id, Request $request)
     {
         $request->validate([
-            'statut' => 'required|string|in:en_attente,confirmee,en_cours,livree,retour,annulee'
+            'statut' => 'required|string|in:en_attente,confirmée,en_livraison,livrée,retour,annulée'
         ]);
 
         try {
@@ -136,10 +138,18 @@ class CommandeController extends Controller
             $commande->statut = $request->statut;
             $commande->save();
 
-            // 🔔 Notifier le client s'il s'agit d'une confirmation ou livraison
-            if (in_array($commande->statut, ['confirmee', 'livree'])) {
+            // 🔔 Notifier le client
+            if (in_array($commande->statut, ['confirmée', 'livrée'])) {
                 $commande->client->notify(new CommandeClientNotification($commande->id, $commande->statut));
             }
+
+            // ✅ Log admin
+            $this->logAdminAction(
+                'update',
+                'Commande',
+                $commande->id,
+                ['statut' => $commande->statut]
+            );
 
             return response()->json([
                 'message' => 'Statut mis à jour',
@@ -150,12 +160,19 @@ class CommandeController extends Controller
             return response()->json(['error' => 'Erreur serveur'], 500);
         }
     }
-
     public function destroy($id)
     {
         try {
             $commande = Commande::findOrFail($id);
             $commande->delete();
+
+            // ✅ Log admin
+            $this->logAdminAction(
+                'delete',
+                'Commande',
+                $commande->id,
+                ['prix_total' => $commande->prix_total]
+            );
 
             return response()->json(['message' => 'Commande supprimée avec succès']);
         } catch (\Exception $e) {

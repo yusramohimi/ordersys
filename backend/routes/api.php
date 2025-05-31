@@ -50,15 +50,20 @@ Route::get('/admin/clientslist', [ClientController::class, 'index']);
 Route::delete('admin/clientslist/{id}', [ClientController::class, 'destroy']);
 Route::get('/admin/clientslist/latest', [ClientController::class, 'latest']);
 
-Route::get('/admin/orders', [CommandeController::class, 'index']);
-Route::delete('/admin/orders/{id}', [CommandeController::class, 'destroy']);
 
-Route::put('/admin/orders/{id}/update', function ($id, Request $request) {
+
+Route::middleware('auth:admin')->group(function () {
+    Route::get('/admin/orders', [CommandeController::class, 'index']);
+    Route::delete('/admin/orders/{id}', [CommandeController::class, 'destroy']);
+    Route::put('/admin/orders/{id}/update-status', [CommandeController::class, 'updateStatus']);
+    Route::put('/admin/orders/{id}/update', function ($id, Request $request) {
     $commande = \App\Models\Commande::findOrFail($id);
     $commande->heure_estimee_livraison = $request->heure_estimee_livraison;
     $commande->save();
 
     return response()->json(['message' => 'Heure de livraison mise à jour.']);
+});
+
 });
 
 

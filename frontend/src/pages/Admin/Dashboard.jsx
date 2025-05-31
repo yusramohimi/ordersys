@@ -20,21 +20,32 @@ const Dashboard = () => {
       .then((data) => setClients(data))
       .catch((err) => console.error("Erreur fetch clients:", err));
   }, []);
-  useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/admin/orders")
-      .then((res) => {
-        const sortedOrders = res.data.sort(
-          (a, b) => new Date(b.created_at) - new Date(a.created_at)
-        );
-        setOrders(sortedOrders);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Erreur lors de la récupération des commandes :", err);
-        setLoading(false);
-      });
-  }, []);
+ useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    console.error("Token admin manquant.");
+    return;
+  }
+
+  axios
+    .get("http://localhost:8000/api/admin/orders", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    })
+    .then((res) => {
+      const sortedOrders = res.data.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      );
+      setOrders(sortedOrders);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error("Erreur lors de la récupération des commandes :", err);
+      setLoading(false);
+    });
+}, []);
 
   useEffect(() => {
     fetch("http://localhost:8000/api/admin/livreurlist/latest")
@@ -70,24 +81,22 @@ const Dashboard = () => {
   };
   const getStatusStyle = (statut) => {
     switch (statut.toLowerCase()) {
-      case "en_attente":
-        return "bg-yellow-100 text-yellow-800";
-      case "confirmee":
-        return "bg-blue-100 text-blue-800";
-      case "en_cours":
-        return "bg-purple-100 text-purple-800";
-      case "en_livraison":
-        return "bg-indigo-100 text-indigo-800";
-      case "livree":
-      case "livrée":
-        return "bg-green-100 text-green-800";
-      case "retour":
-        return "bg-orange-100 text-orange-800";
-      case "annulee":
-      case "annulée":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+    case "en_attente":
+      return "bg-yellow-100 text-yellow-800";
+    case "confirmée":
+      return "bg-blue-100 text-blue-800";
+    case "en_cours": 
+      return "bg-purple-100 text-purple-800";
+    case "en_livraison":
+      return "bg-indigo-200 text-indigo-800";
+    case "livrée":
+      return "bg-green-100 text-green-800";
+    case "retour":
+      return "bg-orange-100 text-orange-800";
+    case "annulée":
+      return "bg-red-100 text-red-800";
+    default:
+      return "bg-gray-100 text-gray-800";
     }
   };
 

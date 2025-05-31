@@ -43,34 +43,59 @@ useEffect(() => {
       .catch(() => alert("Erreur réseau"));
   };
 
-  const handleUpdateOrder = () => {
-    fetch(`http://localhost:8000/api/livreur/orders/${selectedOrder.id}/update`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        heure_estimee_livraison: estimatedTime,
-        statut: selectedStatus,
-      }),
-    })
-      .then((res) => res.json())
-      .then(() => {
-        setOrders((prev) =>
-          prev.map((order) =>
-            order.id === selectedOrder.id
-              ? {
-                  ...order,
-                  heure_estimee_livraison: estimatedTime,
-                  statut: selectedStatus,
-                }
-              : order
-          )
-        );
-        setSelectedOrder(null);
-        setEstimatedTime("");
-        setSelectedStatus("");
+const handleUpdateOrder = () => {
+  const token = localStorage.getItem("token");
+  if (!token || !selectedOrder) return;
+
+  const updateRequests = [];
+
+  if (selectedStatus) {
+    updateRequests.push(
+      fetch(`http://localhost:8000/api/livreur/orders/${selectedOrder.id}/update-status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ statut: selectedStatus }),
       })
-      .catch((err) => console.error("Erreur de mise à jour :", err));
-  };
+    );
+  }
+
+  if (estimatedTime) {
+    updateRequests.push(
+      fetch(`http://localhost:8000/api/livreur/orders/${selectedOrder.id}/update`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ heure_estimee_livraison: estimatedTime }),
+      })
+    );
+  }
+
+  Promise.all(updateRequests)
+    .then(() => {
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === selectedOrder.id
+            ? {
+                ...order,
+                statut: selectedStatus,
+                heure_estimee_livraison: estimatedTime,
+              }
+            : order
+        )
+      );
+      setSelectedOrder(null);
+      setEstimatedStatus("");
+      setEstimatedTime("");
+    })
+    .catch((err) => console.error("Erreur de mise à jour :", err));
+};
 
   const openOrderDetails = (order) => {
     setSelectedOrder(order);
