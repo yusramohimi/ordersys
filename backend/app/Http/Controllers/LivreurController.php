@@ -78,4 +78,22 @@ class LivreurController extends Controller
 
         return response()->json(['message' => 'Profil mis à jour avec succès.']);
     }
+    public function destroy($id)
+{
+    $livreur = Livreur::findOrFail($id);
+    $livreur->delete();
+
+    
+    if (auth('admin')->check()) {
+        $this->logAdminAction(
+            'delete',
+            'Livreur',
+            $livreur->id,
+            ['nom' => $livreur->nom]
+        );
+    }
+
+    return response()->json(['message' => 'Livreur supprimé avec succès.']);
+}
+
 }

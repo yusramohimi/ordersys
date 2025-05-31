@@ -64,6 +64,9 @@ Route::middleware('auth:admin')->group(function () {
     return response()->json(['message' => 'Heure de livraison mise à jour.']);
 });
 
+Route::delete('/admin/livreurs/{id}', [LivreurController::class, 'destroy']);
+
+
 });
 
 

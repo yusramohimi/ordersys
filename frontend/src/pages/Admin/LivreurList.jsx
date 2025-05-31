@@ -22,6 +22,26 @@ function LivreurList() {
 
     fetchLivreurs();
   }, []);
+  
+  const handleDelete = async (id) => {
+  const confirm = window.confirm("Confirmer la suppression du livreur ?");
+  if (!confirm) return;
+
+  const token = localStorage.getItem("token");
+  try {
+    await axios.delete(`http://localhost:8000/api/admin/livreurs/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    });
+
+    setLivreurs((prev) => prev.filter((livreur) => livreur.id !== id));
+  } catch (error) {
+    console.error("Erreur suppression livreur :", error);
+    alert("Erreur lors de la suppression.");
+  }
+};
 
   const filteredLivreurs = livreurs.filter((livreur) =>
     livreur.nom.toLowerCase().includes(searchTerm.toLowerCase())
@@ -79,6 +99,10 @@ function LivreurList() {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Region Name
                 </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Action
+                </th>
+
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -93,6 +117,15 @@ function LivreurList() {
                     <td className="px-4 py-3 text-gray-500">
                       {user.region?.nom || "N/A"}
                     </td>
+                    <td className="px-4 py-3 text-gray-500">
+                      <button
+                        onClick={() => handleDelete(user.id)}
+                       className="border border-red-500 text-red-600 hover:bg-red-50 text-xs px-3 py-1 rounded-md"
+                      >
+                        Delete
+                      </button>
+                    </td>
+
                   </tr>
                 ))
               ) : (
