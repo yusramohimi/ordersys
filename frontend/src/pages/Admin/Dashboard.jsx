@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, Globe, Bell, ChevronDown } from "lucide-react";
 import Apaexlinecolumn from "../../components/charts/Apexlinecolumn";
 import RadialChart from "../../components/charts/RadialChart";
@@ -17,6 +17,41 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [deliveryMen, setDeliveryMen] = useState([]);
   const [admin, setAdmin] = useState({ nom: "", email: "", id: 1 });
+  const [searchTerm, setSearchTerm] = useState("");
+  const sectionsRef = useRef({
+    "sales-overview": null,
+    "revenue-sources": null,
+    "recent-orders": null,
+    "latest-clients": null,
+    "latest-delivery": null
+  });
+
+  const handleSearch = (e) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+
+    if (term === "") {
+      // Si la recherche est vide, affichez toutes les sections
+      Object.values(sectionsRef.current).forEach(section => {
+        if (section) section.style.display = "block";
+      });
+      return;
+    }
+
+    // Filtrez les sections en fonction du terme de recherche
+    Object.entries(sectionsRef.current).forEach(([key, section]) => {
+      if (section) {
+        const shouldShow = key.includes(term.replace(/\s+/g, '-')) || 
+                          section.textContent.toLowerCase().includes(term);
+        section.style.display = shouldShow ? "block" : "none";
+      }
+    });
+  };
+
+  // Ajoutez des refs à vos sections
+  const setSectionRef = (element, key) => {
+    sectionsRef.current[key] = element;
+  };
   const imageMap = {
     1: admin1,
     2: admin2,
@@ -135,6 +170,8 @@ const Dashboard = () => {
                 type="text"
                 placeholder="Search..."
                 className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                value={searchTerm}
+                onChange={handleSearch}
               />
             </div>
             <div className="relative">
@@ -253,7 +290,7 @@ const Dashboard = () => {
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100">
+          <div ref={(el) => setSectionRef(el, "sales-overview")} className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100">
             <div className="p-5 border-b border-gray-100">
               <h2 className="text-lg font-semibold text-gray-800">
                 Sales Overview
@@ -266,7 +303,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div ref={(el) => setSectionRef(el, "revenue-sources")} className= "bg-white rounded-xl shadow-sm border border-gray-100">
             <div className="p-5 border-b border-gray-100">
               <h2 className="text-lg font-semibold text-gray-800">
                 Revenue Sources
@@ -304,7 +341,7 @@ const Dashboard = () => {
         </div>
 
         {/* Orders */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div ref={(el) => setSectionRef(el, "recent-orders")} className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="p-5 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-800">
               Recent Orders
@@ -374,7 +411,7 @@ const Dashboard = () => {
           </div>
         </div>
         {/* Latest Clients */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 mt-6">
+        <div ref={(el) => setSectionRef(el, "latest-clients")} className="bg-white rounded-xl shadow-sm border border-gray-100 mt-6">
           <div className="p-5 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-800">
               Latest Clients
@@ -431,7 +468,7 @@ const Dashboard = () => {
         </div>
 
         {/* Livreur List */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 mt-6">
+        <div ref={(el) => setSectionRef(el, "latest-delivery")} className="bg-white rounded-xl shadow-sm border border-gray-100 mt-6">
           <div className="p-5 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-800">
               Latest Delivery Men
