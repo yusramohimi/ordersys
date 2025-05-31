@@ -23,84 +23,86 @@ use App\Traits\LogsAdminActions;
 class CommandeController extends Controller
 {
     use LogsAdminActions;
-    public function commander(Request $request)
-    {
-        DB::beginTransaction();
-        try {
-            // Création client
-            $password = Str::random(10);
-            $client = Client::create([
+public function commander(Request $request)
+{
+    DB::beginTransaction();
+    try {
+        // Vérifier si client existe déjà ou créer
+        $client = Client::firstOrCreate(
+            ['email' => $request->email],
+            [
                 'nom'       => $request->nom,
                 'prenom'    => $request->prenom,
-                'email'     => $request->email,
                 'telephone' => $request->telephone,
                 'ville'     => $request->ville,
                 'region_id' => $request->region,
                 'adresse'   => $request->adresse,
-                'password'  => bcrypt($password)
-            ]);
+                'password'  => bcrypt($password = Str::random(10))
+            ]
+        );
 
+        // Envoyer les accès si c'est un nouveau client
+        if ($client->wasRecentlyCreated) {
             Mail::to($client->email)->send(new ClientCredentialsMail($client->email, $password));
-
-            $produit = Produit::first();
-            if (!$produit) throw new \Exception('Produit introuvable');
-
-            $quantite = $request->quantite;
-            $subtotal = $produit->prix_unitaire * $quantite;
-            $reduction = 0;
-
-            if ($request->promo_id) {
-                $promo = CodePromo::find($request->promo_id);
-                if ($promo) {
-                    $reduction = $promo->type === 'montant'
-                        ? $promo->reduction
-                        : $subtotal * ($promo->reduction / 100);
-                }
-            }
-
-            $prix_total = max(0, $subtotal - min($reduction, $subtotal));
-
-            // Affecter un livreur de la même région
-            $livreur = Livreur::where('region_id', $client->region_id)->inRandomOrder()->first();
-            if (!$livreur) throw new \Exception("Aucun livreur disponible pour la région du client.");
-
-            // Créer la commande
-            $commande = Commande::create([
-                'client_id'     => $client->id,
-                'livreur_id'    => $livreur->id,
-                'code_promo_id' => $request->promo_id,
-                'prix_total'    => $prix_total,
-                'statut'        => 'en_attente'
-            ]);
-
-            DB::table('commande_produit')->insert([
-                'commande_id'   => $commande->id,
-                'produit_id'    => $produit->id,
-                'quantite'      => $quantite,
-                'prix_unitaire' => $produit->prix_unitaire,
-                'created_at'    => now(),
-                'updated_at'    => now()
-            ]);
-
-            if ($request->promo_id) {
-                CodePromo::where('id', $request->promo_id)->increment('utilisations_actuelles');
-            }
-
-            // 🔔 Notifications
-            Admin::all()->each(function ($admin) use ($commande) {
-                $admin->notify(new NouvelleCommandeNotification($commande->id));
-            });
-
-            $livreur->notify(new CommandeAffecteeLivreurNotification($commande->id));
-
-            DB::commit();
-            return response()->json(['success' => true, 'commande_id' => $commande->id]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error("Erreur commande : " . $e->getMessage());
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+
+        $produit = Produit::first();
+        if (!$produit) throw new \Exception('Produit introuvable');
+
+        $quantite = $request->quantite;
+        $subtotal = $produit->prix_unitaire * $quantite;
+        $reduction = 0;
+
+        if ($request->promo_id) {
+            $promo = CodePromo::find($request->promo_id);
+            if ($promo) {
+                $reduction = $promo->type === 'montant'
+                    ? $promo->reduction
+                    : $subtotal * ($promo->reduction / 100);
+            }
+        }
+
+        $prix_total = max(0, $subtotal - min($reduction, $subtotal));
+
+        // Affecter un livreur de la même région
+        $livreur = Livreur::where('region_id', $client->region_id)->inRandomOrder()->first();
+        if (!$livreur) throw new \Exception("Aucun livreur disponible pour la région du client.");
+
+        // Créer la commande
+        $commande = Commande::create([
+            'client_id'     => $client->id,
+            'livreur_id'    => $livreur->id,
+            'code_promo_id' => $request->promo_id,
+            'prix_total'    => $prix_total,
+            'statut'        => 'en_attente'
+        ]);
+
+        DB::table('commande_produit')->insert([
+            'commande_id'   => $commande->id,
+            'produit_id'    => $produit->id,
+            'quantite'      => $quantite,
+            'prix_unitaire' => $produit->prix_unitaire,
+            'created_at'    => now(),
+            'updated_at'    => now()
+        ]);
+
+        if ($request->promo_id) {
+            CodePromo::where('id', $request->promo_id)->increment('utilisations_actuelles');
+        }
+
+        // 🔔 Notifications
+        Admin::all()->each(fn($admin) => $admin->notify(new NouvelleCommandeNotification($commande->id)));
+        $livreur->notify(new CommandeAffecteeLivreurNotification($commande->id));
+
+        DB::commit();
+        return response()->json(['success' => true, 'commande_id' => $commande->id]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error("Erreur commande : " . $e->getMessage());
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
     }
+}
+
 
     public function index()
     {
