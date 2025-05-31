@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Commande;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class ClientController extends Controller
 {
@@ -44,17 +45,31 @@ class ClientController extends Controller
     }
 
     public function updateProfile(Request $request)
-    {
-        $user = $request->user();
+{
+    $client = $request->user();
 
-        if (!$user instanceof Client) {
-            return response()->json(['message' => 'Non autorisé'], 403);
-        }
-
-        $user->update($request->only(['nom', 'prenom', 'telephone', 'email', 'adresse']));
-
-        return response()->json(['message' => 'Profil mis à jour', 'client' => $user]);
+    if (!$client instanceof Client) {
+        return response()->json(['message' => 'Non autorisé'], 403);
     }
+
+    // Mettre à jour les infos de profil de base
+    $client->fill($request->only(['nom', 'prenom', 'telephone', 'email', 'adresse']));
+
+    // Mettre à jour le mot de passe si demandé
+    if ($request->filled('new_password')) {
+        $request->validate([
+            'new_password' => 'required|string|min:6',
+            'new_password_confirmation' => 'required|same:new_password',
+        ]);
+
+        $client->password = Hash::make($request->new_password);
+    }
+
+    $client->save();
+
+    return response()->json(['message' => 'Profil mis à jour avec succès.', 'client' => $client]);
+}
+
 
     public function mesCommandes(Request $request)
     {
@@ -95,5 +110,21 @@ class ClientController extends Controller
         $factures = $user->commandes()->with('facture')->get()->pluck('facture')->filter();
 
         return response()->json($factures->values());
+    }
+   
+    public function annulerCommande($id, Request $request)
+    {
+        $commande = Commande::where('id', $id)
+            ->where('client_id', $request->user()->id)
+            ->first();
+
+        if (!$commande) {
+            return response()->json(['message' => 'Commande introuvable ou non autorisée.'], 404);
+        }
+
+        $commande->statut = 'annulée';
+        $commande->save();
+
+        return response()->json(['message' => 'Commande annulée avec succès.']);
     }
 }

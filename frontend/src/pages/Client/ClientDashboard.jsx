@@ -3,6 +3,7 @@ import axios from "axios";
 import logoImage from "/src/assets/logo-fr.png";
 import broxodentImage from "/src/assets/broxodent.jpg";
 import FactureModal from "../FactureModal";
+import { Link } from "react-router-dom";
 
 
 const ClientDashboard = () => {
@@ -11,7 +12,8 @@ const ClientDashboard = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [selectedCommande, setSelectedCommande] = useState(null);
-  
+   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwords, setPasswords] = useState({ new_password: "", new_password_confirmation: "" });
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -48,6 +50,63 @@ const ClientDashboard = () => {
 
     fetchData();
   }, []);
+const handlePasswordChange = async () => {
+  if (!passwords.new_password || !passwords.new_password_confirmation) {
+    alert("Veuillez remplir tous les champs.");
+    return;
+  }
+
+  if (passwords.new_password !== passwords.new_password_confirmation) {
+    alert("Les mots de passe ne correspondent pas.");
+    return;
+  }
+
+  try {
+    await axios.put("http://localhost:8000/api/client/profile", passwords, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    });
+
+    alert("Mot de passe mis à jour !");
+    setPasswords({ new_password: "", new_password_confirmation: "" });
+    setShowPasswordModal(false);
+  } catch (error) {
+    console.error("Erreur mise à jour mot de passe :", error);
+    const msg =
+      error.response?.data?.message ||
+      "Erreur lors de la mise à jour du mot de passe.";
+    alert(msg);
+  }
+};
+
+
+  const cancelOrder = async () => {
+  if (!selected) return;
+  try {
+    await axios.put(`http://localhost:8000/api/client/orders/${selected.id}/cancel`, {
+      statut: "annulée",
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      }
+    });
+
+    setOrders(prev =>
+      prev.map(order =>
+        order.id === selected.id ? { ...order, status: "annulée" } : order
+      )
+    );
+
+    setShowOrderDetails(false);
+  } catch (error) {
+    console.error("Erreur annulation :", error);
+  }
+};
+
+
 
   const handleOrderClick = (orderId) => {
     setSelectedOrder(orderId);
@@ -72,12 +131,28 @@ const ClientDashboard = () => {
           <a href="#" className="hover:text-green-600">Accueil</a>
           <a href="#commandes" className="hover:text-green-600">Commandes</a>
           <a href="#factures" className="hover:text-green-600">Factures</a>
-          <a href="#" className="hover:text-green-600">Déconnexion</a>
+           <button onClick={() => setShowPasswordModal(true)} className="hover:text-green-600">Changer mot de passe</button>
+
+          <Link
+            to="/"
+            onClick={() => {
+              localStorage.removeItem("token");
+              window.location.href = "/";
+            }}
+            className="border-transparent text-gray-500 hover:border-red-300 hover:text-red-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+          >
+            Déconnexion
+          </Link>
+
         </div>
       </nav>
 
       <div className="p-8 max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">Bienvenue,</h2>
+        {profile && (
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">
+            Bienvenue {profile.prenom} {profile.nom}
+          </h2>
+        )}
 
         {profile && (
           <div className="bg-white shadow-md rounded-xl p-6 mb-6">
@@ -87,6 +162,7 @@ const ClientDashboard = () => {
             <p><strong>Adresse :</strong> {profile.ville}, {profile.adresse}</p>
           </div>
         )}
+        
 
         <section id="commandes" className="bg-white rounded-lg shadow overflow-hidden mb-8">
           <h2 className="text-xl font-semibold p-6 border-b">Mes commandes</h2>
@@ -192,9 +268,13 @@ const ClientDashboard = () => {
 
               </div>
 
-              <button className="mt-6 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+              <button
+                className="mt-6 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                onClick={cancelOrder}
+              >
                 Annuler la commande
               </button>
+
             </div>
           </div>
         </div>
@@ -206,6 +286,21 @@ const ClientDashboard = () => {
           commandeId={selectedCommande}
           onClose={() => setSelectedCommande(null)}
         />
+      )}
+
+      {/* MODAL MOT DE PASSE */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-white bg-opacity-40 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 shadow-xl max-w-md w-full">
+            <h3 className="text-xl font-semibold mb-4">Changer le mot de passe</h3>
+            <input type="password" placeholder="Nouveau mot de passe" value={passwords.new_password} onChange={(e) => setPasswords({ ...passwords, new_password: e.target.value })} className="w-full mb-3 px-4 py-2 border rounded" />
+            <input type="password" placeholder="Confirmer le mot de passe" value={passwords.new_password_confirmation} onChange={(e) => setPasswords({ ...passwords, new_password_confirmation: e.target.value })} className="w-full mb-4 px-4 py-2 border rounded" />
+            <div className="flex justify-end space-x-2">
+              <button onClick={() => setShowPasswordModal(false)} className="px-4 py-2 border rounded">Annuler</button>
+              <button onClick={handlePasswordChange} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Enregistrer</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
