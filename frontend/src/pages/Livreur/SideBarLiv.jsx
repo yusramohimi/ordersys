@@ -1,23 +1,38 @@
-import { FaShoppingCart, FaPlusCircle, FaUsers, FaBoxOpen, FaWarehouse, FaTruck, FaHockeyPuck, FaSignOutAlt,FaClipboardList } from "react-icons/fa";
-import { NavLink, useNavigate  } from "react-router-dom";
+import {
+  FaShoppingCart,
+  FaPlusCircle,
+  FaUsers,
+  FaBoxOpen,
+  FaWarehouse,
+  FaTruck,
+  FaHockeyPuck,
+  FaSignOutAlt,
+  FaClipboardList,
+} from "react-icons/fa";
+import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
+import logoImage from "/src/assets/logo.png";
 
 function SideBarLiv() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
 
-      await axios.post('http://localhost:8000/api/logout', {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-      });
+      await axios.post(
+        "http://localhost:8000/api/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
 
-      localStorage.removeItem('token');
-      navigate('/login');  // redirection après logout
+      localStorage.removeItem("token");
+      navigate("/login"); // redirection après logout
     } catch (error) {
       console.error("Erreur lors du logout", error);
     }
@@ -25,35 +40,45 @@ function SideBarLiv() {
   return (
     <div className="w-64 h-screen bg-gradient-to-b from-green-700 to-green-800 text-white p-4 flex flex-col fixed shadow-xl">
       {/* Logo/Site Name */}
-      <div className="mb-8 p-4 text-center border-b border-green-600">
-        <h2 className="text-xl font-bold">Gestion Stock</h2>
+      <div className="p-4 border-b border-green-600 shrink-0">
+        <img
+          src={logoImage}
+          alt="Logo"
+          className="w-full max-w-[160px] mx-auto"
+        />
       </div>
-      
+
       {/* Navigation Links */}
       <nav className="flex-1 space-y-2">
-        <NavLink 
-          to="/livreur/dashboard" 
-          className={({ isActive }) => 
+        <NavLink
+          to="/livreur/dashboard"
+          className={({ isActive }) =>
             `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
-            ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
+            ${
+              isActive
+                ? "bg-green-600 shadow-md"
+                : "hover:bg-green-700 hover:pl-5"
+            }`
           }
         >
-          <FaHockeyPuck className="text-lg" /> 
+          <FaHockeyPuck className="text-lg" />
           <span>Dashboard</span>
         </NavLink>
 
-        <NavLink 
-          to="/livreur/orders" 
-          className={({ isActive }) => 
+        <NavLink
+          to="/livreur/orders"
+          className={({ isActive }) =>
             `flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200
-            ${isActive ? 'bg-green-600 shadow-md' : 'hover:bg-green-700 hover:pl-5'}`
+            ${
+              isActive
+                ? "bg-green-600 shadow-md"
+                : "hover:bg-green-700 hover:pl-5"
+            }`
           }
         >
-          <FaShoppingCart className="text-lg" /> 
+          <FaShoppingCart className="text-lg" />
           <span>Orders List</span>
         </NavLink>
-
-
 
         {/* Logout Button */}
         <button
