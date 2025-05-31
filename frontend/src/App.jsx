@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 
 import Dashboard from "./pages/Admin/Dashboard";
 import Login from "./pages/Login";
-import Stock from "./pages/Admin/StockMovement";
 import OrderList from "./pages/Admin/OrderList";
 import ClientsList from "./pages/Admin/ClientsList";
 import AddLivreur from "./pages/Admin/AddLivreur";
@@ -14,6 +13,7 @@ import DashboardLiv from "./pages/Livreur/DashboardLiv";
 import StockMovement from "./pages/Admin/StockMovement";
 import ProfileAdmin from "./pages/Admin/ProfileAdmin";
 import ProfileLivreur from "./pages/Livreur/ProfileLivreur";
+import ClientDashboard from "./pages/Client/ClientDashboard";
 
 function App() {
   const { user } = useSelector((state) => state.auth);
@@ -37,6 +37,7 @@ function App() {
             <Route path="/admin/stock" element={<StockMovement/>}/>
             <Route path="/admin/profile" element={<ProfileAdmin/>}/>
             <Route path="/livreur/profile" element={<ProfileLivreur/>}/>
+            <Route path="/client/dashboard" element={<ClientDashboard/>}/>
           </Routes>
         </div>
       </div>
