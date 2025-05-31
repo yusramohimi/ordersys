@@ -153,6 +153,95 @@ const Dashboard = () => {
         return "bg-gray-100 text-gray-800";
     }
   };
+  const [chartData, setChartData] = useState({
+    ordersStats: null,
+    stockMovements: null,
+    clientsGrowth: null,
+    loading: true,
+  });
+
+  useEffect(() => {
+    const fetchChartData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        };
+
+        const [ordersRes, stockRes, clientsRes] = await Promise.all([
+          axios.get("http://localhost:8000/api/admin/orders-stats", {
+            headers,
+          }),
+          axios.get("http://localhost:8000/api/admin/stock-movements", {
+            headers,
+          }),
+          axios.get("http://localhost:8000/api/admin/clients-growth", {
+            headers,
+          }),
+        ]);
+
+        setChartData({
+          ordersStats: ordersRes.data,
+          stockMovements: stockRes.data,
+          clientsGrowth: clientsRes.data,
+          loading: false,
+        });
+      } catch (error) {
+        console.error("Error fetching chart data:", error);
+        setChartData((prev) => ({ ...prev, loading: false }));
+      }
+    };
+
+    fetchChartData();
+  }, []);
+  const [metrics, setMetrics] = useState({
+    total_revenue: { value: 0, change: 0 },
+    total_orders: { value: 0, change: 0 },
+    total_clients: { value: 0, change: 0 },
+    conversion_rate: { value: 0, change: 0 },
+    loading: true,
+  });
+
+  
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          "http://localhost:8000/api/admin/metrics",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setMetrics({
+          ...response.data,
+          loading: false,
+        });
+      } catch (error) {
+        console.error("Error fetching metrics:", error);
+        setMetrics((prev) => ({ ...prev, loading: false }));
+      }
+    };
+
+    fetchMetrics();
+  }, []);
+  const formatValue = (value, type) => {
+    switch (type) {
+      case "currency":
+        return new Intl.NumberFormat("fr-FR", {
+          style: "currency",
+          currency: "MAD",
+        }).format(value);
+      case "percent":
+        return `${value.toFixed(1)}%`;
+      default:
+        return new Intl.NumberFormat("fr-FR").format(value);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -228,33 +317,33 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           {[
             {
+              key: "total_revenue",
               title: "Total Revenue",
-              value: "$42,892",
-              change: "+12%",
+              type: "currency",
               icon: "↑",
               color: "bg-green-100",
               textColor: "text-green-600",
             },
             {
+              key: "total_orders",
               title: "Orders",
-              value: "1,258",
-              change: "+8%",
+              type: "number",
               icon: "↑",
               color: "bg-blue-100",
               textColor: "text-blue-600",
             },
             {
+              key: "total_clients",
               title: "Customers",
-              value: "2,458",
-              change: "+5%",
+              type: "number",
               icon: "↑",
               color: "bg-purple-100",
               textColor: "text-purple-600",
             },
             {
+              key: "conversion_rate",
               title: "Conversion",
-              value: "3.2%",
-              change: "-0.5%",
+              type: "percent",
               icon: "↓",
               color: "bg-red-100",
               textColor: "text-red-600",
@@ -268,30 +357,57 @@ const Dashboard = () => {
                 <div>
                   <p className="text-sm text-gray-500 mb-1">{metric.title}</p>
                   <h3 className="text-2xl font-bold text-gray-800">
-                    {metric.value}
+                    {metrics.loading ? (
+                      <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+                    ) : (
+                      formatValue(metrics[metric.key]?.value || 0, metric.type)
+                    )}
                   </h3>
                   <div className="flex items-center mt-2">
-                    <span
-                      className={`text-xs ${metric.textColor} flex items-center`}
-                    >
-                      {metric.icon} {metric.change}
-                    </span>
-                    <span className="text-xs text-gray-500 ml-2">
-                      vs last month
-                    </span>
+                    {metrics.loading ? (
+                      <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                    ) : (
+                      <>
+                        <span
+                          className={`text-xs ${
+                            metrics[metric.key]?.change >= 0
+                              ? "text-green-600"
+                              : "text-red-600"
+                          } flex items-center`}
+                        >
+                          {metrics[metric.key]?.change >= 0 ? "↑" : "↓"}{" "}
+                          {Math.abs(metrics[metric.key]?.change).toFixed(1)}%
+                        </span>
+                        <span className="text-xs text-gray-500 ml-2">
+                          vs mois dernier
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div
-                  className={`h-12 w-12 rounded-full ${metric.color} flex items-center justify-center`}
+                  className={`h-12 w-12 rounded-full ${
+                    metrics[metric.key]?.change >= 0
+                      ? "bg-green-100"
+                      : "bg-red-100"
+                  } flex items-center justify-center`}
                 >
-                  <span className="text-lg font-semibold">{metric.change}</span>
+                  <span
+                    className={`text-lg font-semibold ${
+                      metrics[metric.key]?.change >= 0
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {metrics[metric.key]?.change >= 0 ? "↑" : "↓"}
+                  </span>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Charts */}
+        {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <div
             ref={(el) => setSectionRef(el, "sales-overview")}
@@ -303,48 +419,67 @@ const Dashboard = () => {
               </h2>
             </div>
             <div className="p-5 h-100">
-              {" "}
-              {/* Hauteur fixée */}
-              <Apaexlinecolumn />
+              {chartData.loading ? (
+                <div className="flex justify-center items-center h-80">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+                </div>
+              ) : (
+                <Apaexlinecolumn data={chartData.ordersStats} />
+              )}
             </div>
           </div>
 
           <div
-            ref={(el) => setSectionRef(el, "revenue-sources")}
+            ref={(el) => setSectionRef(el, "order-status")}
             className="bg-white rounded-xl shadow-sm border border-gray-100"
           >
             <div className="p-5 border-b border-gray-100">
               <h2 className="text-lg font-semibold text-gray-800">
-                Revenue Sources
+                Orders Status
               </h2>
             </div>
             <div className="p-5">
-              <div className="h-80 flex items-center justify-center">
-                <RadialChart />
-              </div>
-
-              {/* Legend */}
-              <div className="grid grid-cols-3 gap-4 mt-6 text-center">
-                {[
-                  { name: "Direct", value: "65%", color: "bg-blue-500" },
-                  { name: "Organic", value: "25%", color: "bg-green-500" },
-                  { name: "Referral", value: "10%", color: "bg-purple-500" },
-                ].map((source, i) => (
-                  <div key={i}>
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      <span
-                        className={`h-3 w-3 rounded-full ${source.color}`}
-                      ></span>
-                      <span className="text-sm font-medium text-gray-700">
-                        {source.name}
-                      </span>
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      {source.value}
-                    </span>
+              {chartData.loading ? (
+                <div className="flex justify-center items-center h-80">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+                </div>
+              ) : (
+                <>
+                  <div className="h-80 flex items-center justify-center">
+                    <RadialChart data={chartData.ordersStats} />
                   </div>
-                ))}
-              </div>
+                  <div className="grid grid-cols-3 gap-4 mt-6 text-center">
+                    {chartData.ordersStats?.status_stats?.labels?.map(
+                      (label, i) => (
+                        <div key={i}>
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <span
+                              className={`h-3 w-3 rounded-full`}
+                              style={{
+                                backgroundColor:
+                                  chartData.ordersStats.status_stats.colors[i],
+                              }}
+                            ></span>
+                            <span className="text-sm font-medium text-gray-700">
+                              {{
+                                en_attente: "En attente",
+                                confirmée: "Confirmée",
+                                en_livraison: "En livraison",
+                                livrée: "Livrée",
+                                annulée: "Annulée",
+                              }[label] || label}
+                            </span>
+                          </div>
+                          <span className="text-xs text-gray-500">
+                            {chartData.ordersStats.status_stats.data[i]}{" "}
+                            commandes
+                          </span>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -481,7 +616,6 @@ const Dashboard = () => {
             </table>
           </div>
         </div>
-
         {/* Livreur List */}
         <div
           ref={(el) => setSectionRef(el, "latest-delivery")}

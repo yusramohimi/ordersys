@@ -1,49 +1,54 @@
-import React from "react";
-import ReactApexChart from "react-apexcharts";
+import React from 'react';
+import Chart from 'react-apexcharts';
 
-const RadialChartData = {
-  series: [44, 55, 67, 83],
-  options: {
-    chart: {
-      background: "#ffffff",
-      foreColor: "#4B5563", // gray-700
-    },
+const RadialChart = ({ data }) => {
+  if (!data) return <div>Loading chart...</div>;
+
+  const statusMap = {
+    'en_attente': 'En attente',
+    'confirmée': 'Confirmée',
+    'en_livraison': 'En livraison',
+    'livrée': 'Livrée',
+    'annulée': 'Annulée'
+  };
+
+  const options = {
     plotOptions: {
       radialBar: {
         dataLabels: {
           name: {
-            fontSize: "22px",
+            fontSize: '14px',
+            formatter: function(val) {
+              return statusMap[val] || val;
+            }
           },
           value: {
-            fontSize: "16px",
+            fontSize: '16px',
+            formatter: function(val) {
+              return val;
+            }
           },
           total: {
             show: true,
-            label: "Total",
-            formatter: function () {
-              return 249;
-            },
-          },
-        },
-      },
+            label: 'Total',
+            formatter: function() {
+              return data.status_stats.data.reduce((a, b) => a + b, 0);
+            }
+          }
+        }
+      }
     },
-    series: [65, 25, 10], // pour correspondre à ta légende
-    labels: ["Direct", "Organic", "Referral"],
-    colors: ["#3b82f6", "#22c55e", "#8b5cf6"], // blue-500, green-500, purple-500
-  },
-};
+    labels: data.status_stats.labels,
+    colors: data.status_stats.colors
+  };
 
-const RadialChart = () => {
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 h-full w-full">
-      <ReactApexChart
-        options={RadialChartData.options}
-        series={RadialChartData.series}
-        type="radialBar"
-        height="100%"
-        width="100%"
-      />
-    </div>
+    <Chart
+      options={options}
+      series={data.status_stats.data}
+      type="radialBar"
+      height={350}
+    />
   );
 };
 

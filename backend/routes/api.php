@@ -15,6 +15,7 @@ use App\Http\Controllers\API\ProduitController;
 use App\Http\Controllers\API\FactureController;
 use App\Http\Controllers\API\AdminProfileController;
 use App\Http\Controllers\API\NotificationController;
+use App\Http\Controllers\DashboardController;
 
 
 // notifications 
@@ -50,7 +51,12 @@ Route::get('/admin/clientslist', [ClientController::class, 'index']);
 Route::delete('admin/clientslist/{id}', [ClientController::class, 'destroy']);
 Route::get('/admin/clientslist/latest', [ClientController::class, 'latest']);
 
-
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/admin/orders-stats', [DashboardController::class, 'getOrdersStats']);
+    Route::get('/admin/stock-movements', [DashboardController::class, 'getStockMovements']);
+    Route::get('/admin/clients-growth', [DashboardController::class, 'getClientsGrowth']);
+    Route::get('/admin/metrics', [DashboardController::class, 'getMetrics']);
+});
 
 Route::middleware('auth:admin')->group(function () {
     Route::get('/admin/orders', [CommandeController::class, 'index']);
