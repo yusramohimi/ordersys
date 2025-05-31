@@ -23,7 +23,7 @@ const Dashboard = () => {
     "revenue-sources": null,
     "recent-orders": null,
     "latest-clients": null,
-    "latest-delivery": null
+    "latest-delivery": null,
   });
 
   const handleSearch = (e) => {
@@ -32,7 +32,7 @@ const Dashboard = () => {
 
     if (term === "") {
       // Si la recherche est vide, affichez toutes les sections
-      Object.values(sectionsRef.current).forEach(section => {
+      Object.values(sectionsRef.current).forEach((section) => {
         if (section) section.style.display = "block";
       });
       return;
@@ -41,8 +41,9 @@ const Dashboard = () => {
     // Filtrez les sections en fonction du terme de recherche
     Object.entries(sectionsRef.current).forEach(([key, section]) => {
       if (section) {
-        const shouldShow = key.includes(term.replace(/\s+/g, '-')) || 
-                          section.textContent.toLowerCase().includes(term);
+        const shouldShow =
+          key.includes(term.replace(/\s+/g, "-")) ||
+          section.textContent.toLowerCase().includes(term);
         section.style.display = shouldShow ? "block" : "none";
       }
     });
@@ -162,7 +163,9 @@ const Dashboard = () => {
       <div className="flex-1 ml-64 overflow-auto p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
+          <h1 className="text-2xl font-semibold text-gray-800">
+            Bienvenue, {admin.nom || "Admin"}
+          </h1>
           <div className="flex items-center space-x-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -290,7 +293,10 @@ const Dashboard = () => {
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div ref={(el) => setSectionRef(el, "sales-overview")} className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100">
+          <div
+            ref={(el) => setSectionRef(el, "sales-overview")}
+            className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100"
+          >
             <div className="p-5 border-b border-gray-100">
               <h2 className="text-lg font-semibold text-gray-800">
                 Sales Overview
@@ -303,7 +309,10 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div ref={(el) => setSectionRef(el, "revenue-sources")} className= "bg-white rounded-xl shadow-sm border border-gray-100">
+          <div
+            ref={(el) => setSectionRef(el, "revenue-sources")}
+            className="bg-white rounded-xl shadow-sm border border-gray-100"
+          >
             <div className="p-5 border-b border-gray-100">
               <h2 className="text-lg font-semibold text-gray-800">
                 Revenue Sources
@@ -341,7 +350,10 @@ const Dashboard = () => {
         </div>
 
         {/* Orders */}
-        <div ref={(el) => setSectionRef(el, "recent-orders")} className="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div
+          ref={(el) => setSectionRef(el, "recent-orders")}
+          className="bg-white rounded-xl shadow-sm border border-gray-100"
+        >
           <div className="p-5 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-800">
               Recent Orders
@@ -411,7 +423,10 @@ const Dashboard = () => {
           </div>
         </div>
         {/* Latest Clients */}
-        <div ref={(el) => setSectionRef(el, "latest-clients")} className="bg-white rounded-xl shadow-sm border border-gray-100 mt-6">
+        <div
+          ref={(el) => setSectionRef(el, "latest-clients")}
+          className="bg-white rounded-xl shadow-sm border border-gray-100 mt-6"
+        >
           <div className="p-5 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-800">
               Latest Clients
@@ -468,7 +483,10 @@ const Dashboard = () => {
         </div>
 
         {/* Livreur List */}
-        <div ref={(el) => setSectionRef(el, "latest-delivery")} className="bg-white rounded-xl shadow-sm border border-gray-100 mt-6">
+        <div
+          ref={(el) => setSectionRef(el, "latest-delivery")}
+          className="bg-white rounded-xl shadow-sm border border-gray-100 mt-6"
+        >
           <div className="p-5 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-800">
               Latest Delivery Men
