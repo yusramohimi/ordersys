@@ -6,6 +6,9 @@ import Apaexlinecolumn from "../../components/charts/Apexlinecolumn";
 import RadialChart from "../../components/charts/RadialChart";
 import SideBar from "./SideBar";
 import NotificationDropdown from "../NotificationDropdown";
+import admin1 from "../../assets/admins/1.jpg";
+import admin2 from "../../assets/admins/2.jpg";
+import defaultImg from "../../assets/admins/default.png";
 
 const Dashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -13,6 +16,21 @@ const Dashboard = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deliveryMen, setDeliveryMen] = useState([]);
+  const [admin, setAdmin] = useState({ nom: "", email: "", id: 1 });
+  const imageMap = {
+    1: admin1,
+    2: admin2,
+  };
+  useEffect(() => {
+    axios
+      .get("http://localhost:8000/api/admin/profile", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => setAdmin(res.data))
+      .catch((err) => console.error(err));
+  }, []);
   const navigate = useNavigate();
   useEffect(() => {
     fetch("http://localhost:8000/api/admin/clientslist/latest")
@@ -20,32 +38,32 @@ const Dashboard = () => {
       .then((data) => setClients(data))
       .catch((err) => console.error("Erreur fetch clients:", err));
   }, []);
- useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    console.error("Token admin manquant.");
-    return;
-  }
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("Token admin manquant.");
+      return;
+    }
 
-  axios
-    .get("http://localhost:8000/api/admin/orders", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
-    })
-    .then((res) => {
-      const sortedOrders = res.data.sort(
-        (a, b) => new Date(b.created_at) - new Date(a.created_at)
-      );
-      setOrders(sortedOrders);
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.error("Erreur lors de la récupération des commandes :", err);
-      setLoading(false);
-    });
-}, []);
+    axios
+      .get("http://localhost:8000/api/admin/orders", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      })
+      .then((res) => {
+        const sortedOrders = res.data.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+        setOrders(sortedOrders);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Erreur lors de la récupération des commandes :", err);
+        setLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     fetch("http://localhost:8000/api/admin/livreurlist/latest")
@@ -81,22 +99,22 @@ const Dashboard = () => {
   };
   const getStatusStyle = (statut) => {
     switch (statut.toLowerCase()) {
-    case "en_attente":
-      return "bg-yellow-100 text-yellow-800";
-    case "confirmée":
-      return "bg-blue-100 text-blue-800";
-    case "en_cours": 
-      return "bg-purple-100 text-purple-800";
-    case "en_livraison":
-      return "bg-indigo-200 text-indigo-800";
-    case "livrée":
-      return "bg-green-100 text-green-800";
-    case "retour":
-      return "bg-orange-100 text-orange-800";
-    case "annulée":
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
+      case "en_attente":
+        return "bg-yellow-100 text-yellow-800";
+      case "confirmée":
+        return "bg-blue-100 text-blue-800";
+      case "en_cours":
+        return "bg-purple-100 text-purple-800";
+      case "en_livraison":
+        return "bg-indigo-200 text-indigo-800";
+      case "livrée":
+        return "bg-green-100 text-green-800";
+      case "retour":
+        return "bg-orange-100 text-orange-800";
+      case "annulée":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -119,9 +137,6 @@ const Dashboard = () => {
                 className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
               />
             </div>
-            <button className="p-2 text-gray-500 hover:text-gray-700">
-              <Globe className="h-5 w-5" />
-            </button>
             <div className="relative">
               <NotificationDropdown />
             </div>
@@ -131,8 +146,12 @@ const Dashboard = () => {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center space-x-2 focus:outline-none"
               >
-                <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-medium">
-                  A
+                <div className="flex items-center space-x-4">
+                  <img
+                    src={imageMap[admin.id] || defaultImg}
+                    alt="admin"
+                    className="w-10 h-10 rounded-full border object-cover"
+                  />
                 </div>
                 <span className="text-sm font-medium text-gray-700">Admin</span>
                 <ChevronDown className="h-4 w-4 text-gray-500" />
