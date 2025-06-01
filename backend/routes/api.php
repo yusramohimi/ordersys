@@ -109,6 +109,25 @@ Route::middleware('auth:livreur')->group(function () {
     Route::get('/livreur/profile', [LivreurController::class, 'profile']);
     Route::put('/livreur/profile', [LivreurController::class, 'updateProfile']);
 });
+Route::get('/livreur/stats', function (Request $request) {
+        $livreur = $request->user();
+        
+        $orders = $livreur->commandes()->get();
+        
+        $totalRevenue = $orders->sum('prix_total');
+        $totalOrders = $orders->count();
+        $uniqueClients = $orders->groupBy('client_id')->count();
+        $successRate = $orders->whereIn('statut', ['livrée', 'livree'])->count() / max(1, $totalOrders) * 100;
+        
+        // Ici vous devriez aussi calculer les variations par rapport au mois dernier
+        
+        return response()->json([
+            'total_revenue' => ['value' => $totalRevenue, 'change' => 12.5], // Exemple
+            'total_orders' => ['value' => $totalOrders, 'change' => 8.2],
+            'unique_clients' => ['value' => $uniqueClients, 'change' => 5.7],
+            'delivery_success_rate' => ['value' => $successRate, 'change' => 2.3],
+        ]);
+    });
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/client/profile', [ClientController::class, 'profile']);

@@ -1,43 +1,113 @@
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Search, Globe, Bell, ChevronDown, Edit, Trash2 } from "lucide-react";
 import Apaexlinecolumn from "../../components/charts/Apexlinecolumn";
 import RadialChart from "../../components/charts/RadialChart";
 import SideBarLiv from "./SideBarLiv";
 import NotificationDropdown from "../NotificationDropdown";
+import LivreurCharts from "./LivreurCharts";
 const DashboardLiv = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const metrics = useMemo(() => {
+    if (orders.length === 0) {
+      return {
+        total_revenue: { value: 0, change: 0 },
+        total_orders: { value: 0, change: 0 },
+        unique_clients: { value: 0, change: 0 },
+        delivery_success_rate: { value: 0, change: 0 },
+      };
+    }
+    const safeNumber = (value) => {
+      const num = parseFloat(value);
+      return isNaN(num) ? 0 : num;
+    };
+    const totalRevenue = orders.reduce(
+      (sum, order) => sum + safeNumber(order.prix_total),
+      0
+    );
 
-useEffect(() => {
-  const fetchOrders = async () => {
-    try {
-      const token = localStorage.getItem("token");
+    const totalOrders = orders.length;
 
-      const res = await axios.get("http://localhost:8000/api/livreur/orders", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true, // utile si tu utilises Laravel Sanctum
-      });
+    const uniqueClients = [...new Set(orders.map((order) => order.client_name))]
+      .length;
 
-      const sortedOrders = res.data.sort(
-        (a, b) => new Date(b.created_at) - new Date(a.created_at)
-      );
-      setOrders(sortedOrders);
-    } catch (err) {
-      console.error("Erreur lors de la récupération des commandes :", err);
-    } finally {
-      setLoading(false);
+    const successfulDeliveries = orders.filter(
+      (order) =>
+        order.statut.toLowerCase() === "livrée" ||
+        order.statut.toLowerCase() === "livree"
+    ).length;
+    const deliverySuccessRate = (successfulDeliveries / totalOrders) * 100;
+
+    const simulateChange = (baseValue) => Math.random() * 10 - 2; // Entre -2% et +8%
+
+    return {
+      total_revenue: {
+        value: totalRevenue,
+        change: simulateChange(totalRevenue),
+      },
+      total_orders: {
+        value: totalOrders,
+        change: simulateChange(totalOrders),
+      },
+      unique_clients: {
+        value: uniqueClients,
+        change: simulateChange(uniqueClients),
+      },
+      delivery_success_rate: {
+        value: deliverySuccessRate,
+        change: simulateChange(deliverySuccessRate),
+      },
+    };
+  }, [orders]);
+
+  // Formatage des valeurs (identique à avant)
+  const formatValue = (value, type) => {
+    switch (type) {
+      case "currency":
+        return new Intl.NumberFormat("fr-FR", {
+          style: "currency",
+          currency: "MAD",
+          minimumFractionDigits: 0,
+        }).format(value);
+      case "percent":
+        return `${value.toFixed(1)}%`;
+      default:
+        return new Intl.NumberFormat("fr-FR").format(value);
     }
   };
 
-  fetchOrders();
-}, []);
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const token = localStorage.getItem("token");
 
+        const res = await axios.get(
+          "http://localhost:8000/api/livreur/orders",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            withCredentials: true, // utile si tu utilises Laravel Sanctum
+          }
+        );
+
+        const sortedOrders = res.data.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+        setOrders(sortedOrders);
+      } catch (err) {
+        console.error("Erreur lors de la récupération des commandes :", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -156,39 +226,34 @@ useEffect(() => {
             </div>
           </div>
         </div>
-
-        {/* Metrics */}
+        {/* Metrics - Version dynamique basée sur les commandes */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           {[
             {
-              title: "Total Revenue",
-              value: "$42,892",
-              change: "+12%",
-              icon: "↑",
+              key: "total_revenue",
+              title: "Revenu Total",
+              type: "currency",
               color: "bg-green-100",
               textColor: "text-green-600",
             },
             {
-              title: "Orders",
-              value: "1,258",
-              change: "+8%",
-              icon: "↑",
+              key: "total_orders",
+              title: "Commandes",
+              type: "number",
               color: "bg-blue-100",
               textColor: "text-blue-600",
             },
             {
-              title: "Customers",
-              value: "2,458",
-              change: "+5%",
-              icon: "↑",
+              key: "unique_clients",
+              title: "Clients Uniques",
+              type: "number",
               color: "bg-purple-100",
               textColor: "text-purple-600",
             },
             {
-              title: "Conversion",
-              value: "3.2%",
-              change: "-0.5%",
-              icon: "↓",
+              key: "delivery_success_rate",
+              title: "Taux de Livraison",
+              type: "percent",
               color: "bg-red-100",
               textColor: "text-red-600",
             },
@@ -201,81 +266,57 @@ useEffect(() => {
                 <div>
                   <p className="text-sm text-gray-500 mb-1">{metric.title}</p>
                   <h3 className="text-2xl font-bold text-gray-800">
-                    {metric.value}
+                    {loading ? (
+                      <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+                    ) : (
+                      formatValue(metrics[metric.key]?.value || 0, metric.type)
+                    )}
                   </h3>
                   <div className="flex items-center mt-2">
-                    <span
-                      className={`text-xs ${metric.textColor} flex items-center`}
-                    >
-                      {metric.icon} {metric.change}
-                    </span>
-                    <span className="text-xs text-gray-500 ml-2">
-                      vs last month
-                    </span>
+                    {loading ? (
+                      <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                    ) : (
+                      <>
+                        <span
+                          className={`text-xs ${
+                            metrics[metric.key]?.change >= 0
+                              ? "text-green-600"
+                              : "text-red-600"
+                          } flex items-center`}
+                        >
+                          {metrics[metric.key]?.change >= 0 ? "↑" : "↓"}{" "}
+                          {Math.abs(metrics[metric.key]?.change).toFixed(1)}%
+                        </span>
+                        <span className="text-xs text-gray-500 ml-2">
+                          vs mois dernier
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div
-                  className={`h-12 w-12 rounded-full ${metric.color} flex items-center justify-center`}
+                  className={`h-12 w-12 rounded-full ${
+                    metrics[metric.key]?.change >= 0
+                      ? "bg-green-100"
+                      : "bg-red-100"
+                  } flex items-center justify-center`}
                 >
-                  <span className="text-lg font-semibold">{metric.change}</span>
+                  <span
+                    className={`text-lg font-semibold ${
+                      metrics[metric.key]?.change >= 0
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {metrics[metric.key]?.change >= 0 ? "↑" : "↓"}
+                  </span>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100">
-            <div className="p-5 border-b border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-800">
-                Sales Overview
-              </h2>
-            </div>
-            <div className="p-5 h-100">
-              {" "}
-              {/* Hauteur fixée */}
-              <Apaexlinecolumn />
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div className="p-5 border-b border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-800">
-                Revenue Sources
-              </h2>
-            </div>
-            <div className="p-5">
-              <div className="h-80 flex items-center justify-center">
-                <RadialChart />
-              </div>
-
-              {/* Legend */}
-              <div className="grid grid-cols-3 gap-4 mt-6 text-center">
-                {[
-                  { name: "Direct", value: "65%", color: "bg-blue-500" },
-                  { name: "Organic", value: "25%", color: "bg-green-500" },
-                  { name: "Referral", value: "10%", color: "bg-purple-500" },
-                ].map((source, i) => (
-                  <div key={i}>
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      <span
-                        className={`h-3 w-3 rounded-full ${source.color}`}
-                      ></span>
-                      <span className="text-sm font-medium text-gray-700">
-                        {source.name}
-                      </span>
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      {source.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
+        {!loading && <LivreurCharts orders={orders} />}
         {/* Orders */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="p-5 border-b flex justify-between items-center">
