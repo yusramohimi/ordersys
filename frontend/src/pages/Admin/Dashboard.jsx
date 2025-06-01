@@ -4,11 +4,16 @@ import { useState, useEffect, useRef } from "react";
 import { Search, Globe, Bell, ChevronDown } from "lucide-react";
 import Apaexlinecolumn from "../../components/charts/Apexlinecolumn";
 import RadialChart from "../../components/charts/RadialChart";
+import ClientsByRegionChart from "../../components/charts/ClientsByRegionChart";
 import SideBar from "./SideBar";
+import StockGauge from "../../components/charts/StockGauge";
 import NotificationDropdown from "../NotificationDropdown";
 import admin1 from "../../assets/admins/1.jpg";
 import admin2 from "../../assets/admins/2.jpg";
+import Notifications from "./Notifications";
 import defaultImg from "../../assets/admins/default.png";
+import React from 'react';
+
 
 const Dashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -483,6 +488,26 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+        
+   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+  <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+    <h2 className="text-lg font-semibold text-gray-800 mb-4">
+      Stock Disponible
+    </h2>
+    <StockGauge produitId={1} />
+  </div>
+   <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+    <Notifications />
+  </div> 
+  <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+    <h2 className="text-lg font-semibold text-gray-800 mb-4">
+      Nombre de Clients par Région
+    </h2>
+    <ClientsByRegionChart />
+  </div>
+
+ 
+</div>
 
         {/* Orders */}
         <div

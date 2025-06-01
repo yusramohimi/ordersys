@@ -67,4 +67,33 @@ class AuthController extends Controller
             'message' => 'Déconnexion réussie',
         ]);
     }
-}
+public function unlock(Request $request)
+{
+    $request->validate([
+        'password' => 'required|string',
+    ]);
+
+    // 🔍 Vérifie si un admin est connecté
+    if (Auth::guard('admin')->check()) {
+        $admin = Auth::guard('admin')->user();
+
+        if (!Hash::check($request->password, $admin->password)) {
+            return response()->json(['error' => 'Mot de passe incorrect'], 403);
+        }
+
+        return response()->json(['message' => 'Déverrouillage réussi', 'role' => 'admin']);
+    }
+
+    // 🔍 Vérifie si un livreur est connecté
+    if (Auth::guard('livreur')->check()) {
+        $livreur = Auth::guard('livreur')->user();
+
+        if (!Hash::check($request->password, $livreur->password)) {
+            return response()->json(['error' => 'Mot de passe incorrect'], 403);
+        }
+
+        return response()->json(['message' => 'Déverrouillage réussi', 'role' => 'livreur']);
+    }
+
+    return response()->json(['error' => 'Non authentifié'], 401);
+}}

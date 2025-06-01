@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('telephone');
             $table->string('email')->unique();
             $table->string('ville');
-            $table->foreignId('region_id')->constrained()->onDelete('cascade');
+            $table->foreignId('region_id')->constrained()->onDelete('cascade');//de 1 à 15 
             $table->text('adresse');
             $table->text('info_additionnelle')->nullable();
             $table->string('password');

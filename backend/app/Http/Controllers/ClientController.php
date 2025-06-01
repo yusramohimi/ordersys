@@ -6,7 +6,7 @@ use App\Models\Client;
 use App\Models\Commande;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\DB;
 class ClientController extends Controller
 {
     public function index()
@@ -127,4 +127,16 @@ class ClientController extends Controller
 
         return response()->json(['message' => 'Commande annulée avec succès.']);
     }
+
+public function clientsParRegion()
+{
+    $clientsParRegion = DB::table('clients')
+        ->join('regions', 'clients.region_id', '=', 'regions.id')
+        ->select('regions.nom as region', DB::raw('count(*) as total'))
+        ->groupBy('regions.nom')
+        ->orderByDesc('total')
+        ->get();
+
+    return response()->json($clientsParRegion);
+}
 }

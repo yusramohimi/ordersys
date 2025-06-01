@@ -4,7 +4,7 @@ import logoImage from "/src/assets/logo-fr.png";
 import broxodentImage from "/src/assets/broxodent.jpg";
 import FactureModal from "../FactureModal";
 import { Link } from "react-router-dom";
-
+import NotificationDropdown from "../NotificationDropdown";
 
 const ClientDashboard = () => {
   const [profile, setProfile] = useState(null);
@@ -123,29 +123,45 @@ const handlePasswordChange = async () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow-md px-6 py-4 flex justify-between items-center">
-        <div>
-          <img src={logoImage} alt="Logo Santé Parodonte" className="h-12 w-auto" />
-        </div>
-        <div className="space-x-6 text-gray-700 font-medium">
-          <a href="#" className="hover:text-green-600">Accueil</a>
-          <a href="#commandes" className="hover:text-green-600">Commandes</a>
-          <a href="#factures" className="hover:text-green-600">Factures</a>
-           <button onClick={() => setShowPasswordModal(true)} className="hover:text-green-600">Changer mot de passe</button>
+<nav className="bg-white shadow-md px-6 py-4 flex justify-between items-center">
+  {/* Logo */}
+  <div>
+    <img src={logoImage} alt="Logo Santé Parodonte" className="h-12 w-auto" />
+  </div>
 
-          <Link
-            to="/"
-            onClick={() => {
-              localStorage.removeItem("token");
-              window.location.href = "/";
-            }}
-            className="border-transparent text-gray-500 hover:border-red-300 hover:text-red-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-          >
-            Déconnexion
-          </Link>
-
-        </div>
-      </nav>
+  {/* Menu */}
+  <ul className="flex items-center space-x-6 text-gray-700 font-medium">
+    <li>
+      <a href="#" className="hover:text-green-600">Accueil</a>
+    </li>
+    <li>
+      <a href="#commandes" className="hover:text-green-600">Commandes</a>
+    </li>
+    <li>
+      <a href="#factures" className="hover:text-green-600">Factures</a>
+    </li>
+    <li>
+      <button onClick={() => setShowPasswordModal(true)} className="hover:text-green-600">
+        Changer mot de passe
+      </button>
+    </li>
+    <li>
+      <Link
+        to="/"
+        onClick={() => {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }}
+        className="text-gray-500 hover:text-red-600"
+      >
+        Déconnexion
+      </Link>
+    </li>
+    <li>
+      <NotificationDropdown />
+    </li>
+  </ul>
+</nav>
 
       <div className="p-8 max-w-7xl mx-auto">
         {profile && (

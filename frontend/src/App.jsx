@@ -14,7 +14,7 @@ import StockMovement from "./pages/Admin/StockMovement";
 import ProfileAdmin from "./pages/Admin/ProfileAdmin";
 import ProfileLivreur from "./pages/Livreur/ProfileLivreur";
 import ClientDashboard from "./pages/Client/ClientDashboard";
-
+import LockScreen from "./pages/LockScreen";
 function App() {
   const { user } = useSelector((state) => state.auth);
   return (
@@ -38,6 +38,7 @@ function App() {
             <Route path="/admin/profile" element={<ProfileAdmin/>}/>
             <Route path="/livreur/profile" element={<ProfileLivreur/>}/>
             <Route path="/client/dashboard" element={<ClientDashboard/>}/>
+            <Route path="/lock" element={<LockScreen />} />
           </Routes>
         </div>
       </div>

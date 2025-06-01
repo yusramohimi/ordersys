@@ -172,3 +172,6 @@ Route::post('/commander', [CommandeController::class, 'commander']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
+Route::get('/produits/{id}/stock', [ProduitController::class, 'getStockData']);
+Route::get('/clients/regions', [ClientController::class, 'clientsParRegion']);
+Route::middleware('auth:sanctum')->post('/unlock', [AuthController::class, 'unlock']);

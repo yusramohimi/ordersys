@@ -7,10 +7,12 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Client extends Authenticatable
 {
     use HasApiTokens, Notifiable;
+    use HasFactory;
 
     protected $fillable = [
         'nom',

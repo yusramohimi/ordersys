@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use App\Models\Admin;
 use App\Models\Client;
 use App\Models\Commande;
+use App\Models\StockMovement;
 use App\Models\Produit;
 use App\Models\Livreur;
 use App\Models\CodePromo;
@@ -18,6 +19,7 @@ use App\Mail\ClientCredentialsMail;
 use App\Notifications\NouvelleCommandeNotification;
 use App\Notifications\CommandeAffecteeLivreurNotification;
 use App\Notifications\CommandeClientNotification;
+use App\Http\Controllers\API\StockMovementController;
 use App\Traits\LogsAdminActions;
 
 class CommandeController extends Controller
@@ -81,7 +83,12 @@ class CommandeController extends Controller
                 'created_at'    => now(),
                 'updated_at'    => now()
             ]);
-
+            StockMovement::create([
+                'produit_id' => $produit->id,
+                'type'       => 'sortie',
+                'quantite'   => $quantite,
+                'motif'      => 'Commande client #' . $commande->id,
+            ]);
             if ($request->promo_id) {
                 CodePromo::where('id', $request->promo_id)->increment('utilisations_actuelles');
             }

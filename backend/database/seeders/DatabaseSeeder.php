@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
             ClientSeeder::class,
             LivreurSeeder::class,
             CommandeSeeder::class,
-
+            ClientsSeeder::class
         ]);
     }
 }

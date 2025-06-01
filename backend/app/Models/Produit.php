@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Produit extends Model
 {
-    protected $fillable = ['nom', 'description', 'prix_unitaire'];
+    protected $fillable = ['nom', 'description', 'prix_unitaire' , 'stock_initial'];
 
     public function commandes(): BelongsToMany
     {
@@ -20,5 +20,14 @@ class Produit extends Model
     {
         return $this->hasMany(StockMovement::class);
     }
+    public function stockActuel(): int
+{
+    $entrées = $this->stockMovements()->where('type', 'entree')->sum('quantite');
+    $sorties = $this->stockMovements()->where('type', 'sortie')->sum('quantite');
+    $ajustements = $this->stockMovements()->where('type', 'ajustement')->sum('quantite');
+
+    return $this->stock_initial + $entrées + $ajustements - $sorties;
+}
+
 }
 
