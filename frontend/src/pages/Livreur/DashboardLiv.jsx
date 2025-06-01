@@ -231,28 +231,28 @@ const DashboardLiv = () => {
           {[
             {
               key: "total_revenue",
-              title: "Revenu Total",
+              title: "Total Revenu",
               type: "currency",
               color: "bg-green-100",
               textColor: "text-green-600",
             },
             {
               key: "total_orders",
-              title: "Commandes",
+              title: "Orders",
               type: "number",
               color: "bg-blue-100",
               textColor: "text-blue-600",
             },
             {
               key: "unique_clients",
-              title: "Clients Uniques",
+              title: "Clients",
               type: "number",
               color: "bg-purple-100",
               textColor: "text-purple-600",
             },
             {
               key: "delivery_success_rate",
-              title: "Taux de Livraison",
+              title: "Delivered Orders",
               type: "percent",
               color: "bg-red-100",
               textColor: "text-red-600",
